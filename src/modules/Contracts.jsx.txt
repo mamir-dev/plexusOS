@@ -70,7 +70,7 @@ const GlobalStyles = () => (
             background: rgba(6,182,212,0.06);
             box-shadow: 0 0 0 3px rgba(6,182,212,0.12);
         }
-        .con-search input { background: transparent; border: none; outline: none; color: #f1f5f9; }
+        .con-search input { background: transparent; border: none; outline: none; }
         .con-search input::placeholder { color: rgba(148,163,184,0.45); }
 
         /* ── Upload button ── */
@@ -101,7 +101,6 @@ const GlobalStyles = () => (
             transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
             border: 1px solid rgba(255,255,255,0.10);
             background: rgba(255,255,255,0.04);
-            color: #94a3b8;
         }
         .con-btn:hover {
             background: rgba(6,182,212,0.15);
@@ -165,7 +164,6 @@ const GlobalStyles = () => (
             transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
             border: 1px solid rgba(255,255,255,0.10);
             background: rgba(255,255,255,0.04);
-            color: #94a3b8;
         }
         .con-renew-btn:hover {
             background: rgba(245,158,11,0.15);
@@ -226,7 +224,14 @@ const iconBg = {
 
 /* ─── StatCard ────────────────────────────────────────────────────────── */
 const StatCard = ({ label, value, sub, icon, color = 'cyan' }) => {
+    const { dark } = useTheme();
     const ic = iconBg[color] || iconBg.cyan;
+    
+    // Theme-based colors for text
+    const valueColor = dark ? '#f1f5f9' : '#0f172a';
+    const labelColor = dark ? 'rgba(148,163,184,0.60)' : 'rgba(71,85,105,0.70)';
+    const subColor = dark ? 'rgba(148,163,184,0.45)' : 'rgba(71,85,105,0.55)';
+    
     return (
         <div className={`con-glass con-stat-${color} con-enter rounded-2xl p-5 flex flex-col gap-4 cursor-default`}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -238,9 +243,9 @@ const StatCard = ({ label, value, sub, icon, color = 'cyan' }) => {
                 <ChevronRight size={14} style={{ color: 'rgba(148,163,184,0.28)', marginTop: 2 }} />
             </div>
             <div>
-                <div className="con-mono" style={{ fontSize: 26, fontWeight: 800, color: '#f1f5f9', lineHeight: 1.1, letterSpacing: '-0.02em' }}>{value}</div>
-                <div style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'rgba(148,163,184,0.60)', marginTop: 3 }}>{label}</div>
-                <div style={{ fontSize: 12, color: 'rgba(148,163,184,0.45)', marginTop: 2 }}>{sub}</div>
+                <div className="con-mono" style={{ fontSize: 26, fontWeight: 800, color: valueColor, lineHeight: 1.1, letterSpacing: '-0.02em' }}>{value}</div>
+                <div style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: labelColor, marginTop: 3 }}>{label}</div>
+                <div style={{ fontSize: 12, color: subColor, marginTop: 2 }}>{sub}</div>
             </div>
         </div>
     );
@@ -268,9 +273,9 @@ const TabBar = ({ tabs, active, onChange }) => (
 );
 
 /* ─── SectionHeader ───────────────────────────────────────────────────── */
-const SectionHeader = ({ title, right }) => (
-    <div className="con-section-title" style={{ marginBottom: 16, justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
-        <span style={{ fontSize: 14, fontWeight: 700, color: '#f1f5f9', letterSpacing: '-0.01em' }}>{title}</span>
+const SectionHeader = ({ title, right, dark }) => (
+    <div className="con-section-title" style={{ marginBottom: 16, justifyContent: 'flex-start', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
+        <span style={{ fontSize: 14, fontWeight: 700, color: dark ? '#f1f5f9' : '#0f172a', letterSpacing: '-0.01em' }}>{title}</span>
         {right && <div>{right}</div>}
     </div>
 );
@@ -293,6 +298,17 @@ export function ContractsModule() {
         c.type.toLowerCase().includes(search.toLowerCase()) ||
         c.status.toLowerCase().includes(search.toLowerCase())
     );
+
+    // Theme-based colors
+    const textPrimary = dark ? '#f1f5f9' : '#0f172a';
+    const textSecondary = dark ? 'rgba(148,163,184,0.60)' : 'rgba(71,85,105,0.70)';
+    const textTertiary = dark ? 'rgba(148,163,184,0.45)' : 'rgba(71,85,105,0.55)';
+    const textMuted = dark ? 'rgba(148,163,184,0.50)' : 'rgba(71,85,105,0.60)';
+    const borderColor = dark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.08)';
+    const cardBg = dark ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.5)';
+    const inputColor = dark ? '#f1f5f9' : '#0f172a';
+    const tableHeaderColor = dark ? 'rgba(148,163,184,0.50)' : 'rgba(71,85,105,0.70)';
+    const tableTextColor = dark ? '#e2e8f0' : '#334155';
 
     return (
         <div className="con-module" style={{ display: 'flex', flexDirection: 'column', gap: 20, width: '100%' }}>
@@ -320,8 +336,8 @@ export function ContractsModule() {
                                 <Upload size={20} strokeWidth={1.5} />
                             </div>
                             <div>
-                                <div style={{ fontSize: 13, fontWeight: 700, color: '#67e8f9', marginBottom: 2 }}>Digitization Target: 30+ contracts remain in filing cabinets</div>
-                                <div style={{ fontSize: 12, color: 'rgba(103,232,249,0.55)' }}>Target: 80% digitized by Day 45 of pilot. Upload outstanding provider agreements ASAP.</div>
+                                <div style={{ fontSize: 13, fontWeight: 700, color: '#0891b2', marginBottom: 2 }}>Digitization Target: 30+ contracts remain in filing cabinets</div>
+                                <div style={{ fontSize: 12, color: 'rgba(8, 145, 178, 0.9)' }}>Target: 80% digitized by Day 45 of pilot. Upload outstanding provider agreements ASAP.</div>
                             </div>
                         </div>
                     </div>
@@ -331,16 +347,16 @@ export function ContractsModule() {
                         {/* Search + Upload header */}
                         <div style={{
                             display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between',
-                            gap: 12, padding: '16px 20px', borderBottom: '1px solid rgba(255,255,255,0.07)',
+                            gap: 12, padding: '16px 20px', borderBottom: `1px solid ${borderColor}`,
                         }}>
                             <div className="con-search" style={{
                                 flex: '1 1 260px', maxWidth: 400,
                                 display: 'flex', alignItems: 'center', gap: 10,
                                 padding: '9px 14px', borderRadius: 12,
                             }}>
-                                <Search size={15} style={{ color: 'rgba(148,163,184,0.45)', flexShrink: 0 }} />
+                                <Search size={15} style={{ color: textTertiary, flexShrink: 0 }} />
                                 <input
-                                    style={{ flex: 1, fontSize: 13, fontWeight: 500, fontFamily: 'Outfit,sans-serif', minWidth: 0 }}
+                                    style={{ flex: 1, fontSize: 13, fontWeight: 500, fontFamily: 'Outfit,sans-serif', minWidth: 0, color: inputColor }}
                                     placeholder="Search contracts..."
                                     value={search}
                                     onChange={e => setSearch(e.target.value)}
@@ -367,24 +383,25 @@ export function ContractsModule() {
                                         gap: 16, padding: '14px 20px', cursor: 'pointer',
                                     }}>
                                         <div style={{ flex: 1, minWidth: 0 }}>
-                                            <div style={{ fontSize: 14, fontWeight: 700, color: '#f1f5f9', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 8 }}>{c.name}</div>
+                                            <div style={{ fontSize: 14, fontWeight: 700, color: textPrimary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 8 }}>{c.name}</div>
                                             <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8 }}>
                                                 <Badge color={typeColor}>{c.type}</Badge>
                                                 <span style={{
-                                                    fontSize: 11, fontWeight: 500, color: 'rgba(148,163,184,0.50)',
-                                                    paddingLeft: 8, borderLeft: '1px solid rgba(255,255,255,0.10)', whiteSpace: 'nowrap',
+                                                    fontSize: 11, fontWeight: 500, color: textMuted,
+                                                    paddingLeft: 8, borderLeft: `1px solid ${borderColor}`, whiteSpace: 'nowrap',
                                                 }}>{c.sites}</span>
                                             </div>
                                         </div>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: 20, flexShrink: 0 }}>
                                             <div style={{ textAlign: 'right' }}>
-                                                <div className="con-mono" style={{ fontSize: 13, fontWeight: 700, color: '#f1f5f9', letterSpacing: '-0.01em' }}>{c.value}</div>
-                                                <div style={{ fontSize: 11, color: 'rgba(148,163,184,0.45)', marginTop: 2 }}>Exp: {c.expiry}</div>
+                                                <div className="con-mono" style={{ fontSize: 13, fontWeight: 700, color: textPrimary, letterSpacing: '-0.01em' }}>{c.value}</div>
+                                                <div style={{ fontSize: 11, color: textTertiary, marginTop: 2 }}>Exp: {c.expiry}</div>
                                             </div>
                                             <Badge color={statusColor}>{c.status}</Badge>
                                             <button className="con-btn" style={{
                                                 fontSize: 11, fontWeight: 600, padding: '5px 14px',
                                                 borderRadius: 8, cursor: 'pointer', fontFamily: 'Outfit,sans-serif',
+                                                color: dark ? '#94a3b8' : '#475569',
                                             }}>View</button>
                                         </div>
                                     </div>
@@ -400,6 +417,7 @@ export function ContractsModule() {
                 <div key="employment" className="con-glass con-enter rounded-2xl p-6" style={{ display: 'flex', flexDirection: 'column' }}>
                     <SectionHeader
                         title="Provider Employment Contracts"
+                        dark={dark}
                         right={
                             <button className="con-compare-btn" style={{
                                 padding: '6px 16px', borderRadius: 9, fontSize: 12,
@@ -418,7 +436,7 @@ export function ContractsModule() {
                         ].map((emp, idx) => (
                             <div key={emp.provider} className="con-emp-card con-enter" style={{
                                 padding: '16px 18px', borderRadius: 14, cursor: 'pointer',
-                                background: 'rgba(255,255,255,0.03)',
+                                background: cardBg,
                                 animationDelay: `${idx * 55}ms`,
                             }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
@@ -432,7 +450,7 @@ export function ContractsModule() {
                                         }}>
                                             {emp.provider.split(' ').slice(1).map(n=>n[0]).join('').slice(0,2)}
                                         </div>
-                                        <span style={{ fontSize: 14, fontWeight: 700, color: '#f1f5f9' }}>{emp.provider}</span>
+                                        <span style={{ fontSize: 14, fontWeight: 700, color: textPrimary }}>{emp.provider}</span>
                                     </div>
                                     <Badge color="green">Active</Badge>
                                 </div>
@@ -446,8 +464,8 @@ export function ContractsModule() {
                                         { label: "Expires",      value: emp.expiry      },
                                     ].map(f => (
                                         <div key={f.label}>
-                                            <div style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'rgba(148,163,184,0.45)', marginBottom: 4 }}>{f.label}</div>
-                                            <div className="con-mono" style={{ fontSize: 13, fontWeight: 700, color: '#e2e8f0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{f.value}</div>
+                                            <div style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: textSecondary, marginBottom: 4 }}>{f.label}</div>
+                                            <div className="con-mono" style={{ fontSize: 13, fontWeight: 700, color: tableTextColor, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{f.value}</div>
                                         </div>
                                     ))}
                                 </div>
@@ -460,7 +478,7 @@ export function ContractsModule() {
             {/* ── Lifecycle ── */}
             {tab === "lifecycle" && (
                 <div key="lifecycle" className="con-glass con-enter rounded-2xl p-6" style={{ display: 'flex', flexDirection: 'column' }}>
-                    <SectionHeader title="Contract Renewal Calendar" />
+                    <SectionHeader title="Contract Renewal Calendar" dark={dark} />
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                         {[
                             { name: "BlueCross Provider Agreement",    expiry: "Apr 15, 2026", daysLeft: 47,  urgency: "high"   },
@@ -471,13 +489,13 @@ export function ContractsModule() {
                         ].map((c, idx) => {
                             const dotColor = c.urgency === "high" ? '#fbbf24' : c.urgency === "medium" ? '#60a5fa' : '#34d399';
                             const dotGlow  = c.urgency === "high" ? 'rgba(245,158,11,0.55)' : c.urgency === "medium" ? 'rgba(59,130,246,0.50)' : 'rgba(16,185,129,0.50)';
-                            const daysColor = c.daysLeft < 60 ? '#fbbf24' : '#f1f5f9';
+                            const daysColor = c.daysLeft < 60 ? '#fbbf24' : textPrimary;
                             const daysShadow = c.daysLeft < 60 ? '0 0 14px rgba(245,158,11,0.35)' : 'none';
                             return (
                                 <div key={c.name} className="con-lifecycle-card con-enter" style={{
                                     display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center',
                                     gap: 16, padding: '14px 16px', borderRadius: 14, cursor: 'pointer',
-                                    background: 'rgba(255,255,255,0.03)',
+                                    background: cardBg,
                                     animationDelay: `${idx * 55}ms`,
                                 }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 14, flex: 1, minWidth: 0, overflow: 'hidden' }}>
@@ -486,18 +504,19 @@ export function ContractsModule() {
                                             background: dotColor, boxShadow: `0 0 8px ${dotGlow}`,
                                         }} />
                                         <div style={{ flex: 1, minWidth: 0 }}>
-                                            <div style={{ fontSize: 13, fontWeight: 700, color: '#f1f5f9', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.name}</div>
-                                            <div style={{ fontSize: 11, color: 'rgba(148,163,184,0.50)', marginTop: 3 }}>Expires: {c.expiry}</div>
+                                            <div style={{ fontSize: 13, fontWeight: 700, color: textPrimary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.name}</div>
+                                            <div style={{ fontSize: 11, color: textMuted, marginTop: 3 }}>Expires: {c.expiry}</div>
                                         </div>
                                     </div>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 18, flexShrink: 0 }}>
                                         <div style={{ textAlign: 'right' }}>
                                             <div className="con-mono" style={{ fontSize: 16, fontWeight: 800, color: daysColor, textShadow: daysShadow, letterSpacing: '-0.02em' }}>{c.daysLeft}d</div>
-                                            <div style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'rgba(148,163,184,0.38)', marginTop: 1 }}>remaining</div>
+                                            <div style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: textTertiary, marginTop: 1 }}>remaining</div>
                                         </div>
                                         <button className="con-renew-btn" style={{
                                             fontSize: 11, fontWeight: 600, padding: '6px 14px',
                                             borderRadius: 9, cursor: 'pointer', fontFamily: 'Outfit,sans-serif',
+                                            color: dark ? '#94a3b8' : '#475569',
                                         }}>Start Renewal</button>
                                     </div>
                                 </div>
@@ -510,16 +529,16 @@ export function ContractsModule() {
             {/* ── Payor Intel ── */}
             {tab === "payor" && (
                 <div key="payor" className="con-glass con-enter rounded-2xl p-6" style={{ marginBottom: 24 }}>
-                    <SectionHeader title="Payor Rate Comparison — Select CPT Codes" />
+                    <SectionHeader title="Payor Rate Comparison — Select CPT Codes" dark={dark} />
                     <div className="con-scroll" style={{ overflowX: 'auto' }}>
                         <table style={{ width: '100%', minWidth: 700, borderCollapse: 'collapse', textAlign: 'left' }}>
                             <thead>
-                                <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.07)', background: 'rgba(255,255,255,0.03)' }}>
+                                <tr style={{ borderBottom: `1px solid ${borderColor}`, background: dark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)' }}>
                                     {["CPT Code", "Description", "Medicare", "BlueCross", "Aetna", "Medicaid"].map((h, idx) => (
                                         <th key={h} style={{
                                             padding: '12px 18px',
                                             fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.10em',
-                                            color: 'rgba(148,163,184,0.50)',
+                                            color: tableHeaderColor,
                                             textAlign: idx < 2 ? 'left' : 'right',
                                         }}>{h}</th>
                                     ))}
@@ -540,15 +559,15 @@ export function ContractsModule() {
                                                 textShadow: '0 0 10px rgba(6,182,212,0.35)',
                                             }}>{row.cpt}</span>
                                         </td>
-                                        <td style={{ padding: '14px 18px', fontSize: 13, fontWeight: 500, color: '#e2e8f0' }}>{row.desc}</td>
+                                        <td style={{ padding: '14px 18px', fontSize: 13, fontWeight: 500, color: tableTextColor }}>{row.desc}</td>
                                         <td style={{ padding: '14px 18px', textAlign: 'right' }}>
-                                            <span className="con-mono" style={{ fontSize: 13, fontWeight: 600, color: 'rgba(148,163,184,0.65)' }}>{row.mc}</span>
+                                            <span className="con-mono" style={{ fontSize: 13, fontWeight: 600, color: textMuted }}>{row.mc}</span>
                                         </td>
                                         <td style={{ padding: '14px 18px', textAlign: 'right' }}>
                                             <span className="con-mono" style={{ fontSize: 13, fontWeight: 700, color: '#34d399', textShadow: '0 0 10px rgba(16,185,129,0.30)' }}>{row.bc}</span>
                                         </td>
                                         <td style={{ padding: '14px 18px', textAlign: 'right' }}>
-                                            <span className="con-mono" style={{ fontSize: 13, fontWeight: 600, color: 'rgba(148,163,184,0.65)' }}>{row.ae}</span>
+                                            <span className="con-mono" style={{ fontSize: 13, fontWeight: 600, color: textMuted }}>{row.ae}</span>
                                         </td>
                                         <td style={{ padding: '14px 18px', textAlign: 'right' }}>
                                             <span className="con-mono" style={{ fontSize: 13, fontWeight: 700, color: '#f87171', textShadow: '0 0 10px rgba(239,68,68,0.28)' }}>{row.md}</span>

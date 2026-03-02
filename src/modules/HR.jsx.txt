@@ -7,7 +7,7 @@ import { Users, FileCheck, DollarSign, Calendar, GraduationCap, AlertCircle, Clo
 const fmtK = (n) => n >= 1000000 ? `$${(n / 1000000).toFixed(2)}M` : `$${(n / 1000).toFixed(0)}K`;
 
 /* ─── Injected global styles (glassmorphism + custom animations) ────────── */
-const GlobalStyles = () => (
+const GlobalStyles = ({ dark }) => (
     <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
@@ -16,16 +16,34 @@ const GlobalStyles = () => (
 
         /* Glassmorphism card */
         .glass-card {
-            background: rgba(255,255,255,0.04);
+            background: ${dark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.02)'};
             backdrop-filter: blur(20px) saturate(180%);
             -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border: 1px solid rgba(255,255,255,0.08);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.06);
+            border: 1px solid ${dark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'};
+            box-shadow: ${dark 
+                ? '0 8px 32px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.06)'
+                : '0 8px 32px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.5)'};
             transition: box-shadow 0.3s ease, transform 0.3s ease, border-color 0.3s ease;
         }
         .glass-card:hover {
-            box-shadow: 0 16px 48px rgba(0,0,0,0.36), inset 0 1px 0 rgba(255,255,255,0.1);
-            border-color: rgba(255,255,255,0.14);
+            box-shadow: ${dark 
+                ? '0 16px 48px rgba(0,0,0,0.36), inset 0 1px 0 rgba(255,255,255,0.1)'
+                : '0 16px 48px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.5)'};
+            border-color: ${dark ? 'rgba(255,255,255,0.14)' : 'rgba(0,0,0,0.08)'};
+        }
+
+        /* Text colors based on theme */
+        .hr-text-primary {
+            color: ${dark ? '#f1f5f9' : '#0f172a'} !important;
+        }
+        .hr-text-secondary {
+            color: ${dark ? 'rgba(148,163,184,0.75)' : 'rgba(51,65,85,0.75)'} !important;
+        }
+        .hr-text-tertiary {
+            color: ${dark ? 'rgba(148,163,184,0.45)' : 'rgba(51,65,85,0.45)'} !important;
+        }
+        .hr-text-muted {
+            color: ${dark ? 'rgba(148,163,184,0.35)' : 'rgba(51,65,85,0.35)'} !important;
         }
 
         /* Stat card glow on hover */
@@ -135,14 +153,16 @@ const GlobalStyles = () => (
         /* Alert banner glow */
         .alert-banner-red {
             border-left: 3px solid rgba(239,68,68,0.8);
-            background: rgba(239,68,68,0.08);
+            background: ${dark ? 'rgba(239,68,68,0.08)' : 'rgba(239,68,68,0.03)'};
             backdrop-filter: blur(12px);
-            box-shadow: 0 4px 20px rgba(239,68,68,0.12), inset 0 1px 0 rgba(255,255,255,0.05);
+            box-shadow: 0 4px 20px rgba(239,68,68,0.12), inset 0 1px 0 ${dark ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.5)'};
         }
 
         /* Training card */
         .training-card {
             transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
+            background: ${dark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)'};
+            border: 1px solid ${dark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.05)'};
         }
         .training-card:hover {
             border-color: rgba(99,102,241,0.45) !important;
@@ -159,13 +179,13 @@ const GlobalStyles = () => (
 
 /* ─── Badge ─────────────────────────────────────────────────────────────── */
 const colorMap = {
-    purple: { bg: 'rgba(168,85,247,0.15)', text: '#c084fc', border: 'rgba(168,85,247,0.30)' },
-    blue:   { bg: 'rgba(59,130,246,0.15)',  text: '#60a5fa', border: 'rgba(59,130,246,0.30)' },
-    cyan:   { bg: 'rgba(6,182,212,0.15)',   text: '#22d3ee', border: 'rgba(6,182,212,0.30)' },
-    green:  { bg: 'rgba(16,185,129,0.15)',  text: '#34d399', border: 'rgba(16,185,129,0.30)' },
-    amber:  { bg: 'rgba(245,158,11,0.15)',  text: '#fbbf24', border: 'rgba(245,158,11,0.30)' },
-    red:    { bg: 'rgba(239,68,68,0.15)',   text: '#f87171', border: 'rgba(239,68,68,0.30)' },
-    gray:   { bg: 'rgba(148,163,184,0.12)', text: '#94a3b8', border: 'rgba(148,163,184,0.25)' },
+    purple: { bg: 'rgba(168,85,247,0.15)', text: '#a855f7', border: 'rgba(168,85,247,0.30)' },
+    blue:   { bg: 'rgba(59,130,246,0.15)',  text: '#3b82f6', border: 'rgba(59,130,246,0.30)' },
+    cyan:   { bg: 'rgba(6,182,212,0.15)',   text: '#06b6d4', border: 'rgba(6,182,212,0.30)' },
+    green:  { bg: 'rgba(16,185,129,0.15)',  text: '#10b981', border: 'rgba(16,185,129,0.30)' },
+    amber:  { bg: 'rgba(245,158,11,0.15)',  text: '#f59e0b', border: 'rgba(245,158,11,0.30)' },
+    red:    { bg: 'rgba(239,68,68,0.15)',   text: '#ef4444', border: 'rgba(239,68,68,0.30)' },
+    gray:   { bg: 'rgba(148,163,184,0.12)', text: '#64748b', border: 'rgba(148,163,184,0.25)' },
 };
 
 const Badge = ({ color = 'gray', children }) => {
@@ -185,16 +205,18 @@ const Badge = ({ color = 'gray', children }) => {
 
 /* ─── StatCard ───────────────────────────────────────────────────────────── */
 const iconBg = {
-    purple: { bg: 'rgba(168,85,247,0.18)', color: '#c084fc' },
-    blue:   { bg: 'rgba(59,130,246,0.18)',  color: '#60a5fa' },
-    cyan:   { bg: 'rgba(6,182,212,0.18)',   color: '#22d3ee' },
-    amber:  { bg: 'rgba(245,158,11,0.18)',  color: '#fbbf24' },
-    green:  { bg: 'rgba(16,185,129,0.18)',  color: '#34d399' },
-    red:    { bg: 'rgba(239,68,68,0.18)',   color: '#f87171' },
+    purple: { bg: 'rgba(168,85,247,0.18)', color: '#a855f7' },
+    blue:   { bg: 'rgba(59,130,246,0.18)',  color: '#3b82f6' },
+    cyan:   { bg: 'rgba(6,182,212,0.18)',   color: '#06b6d4' },
+    amber:  { bg: 'rgba(245,158,11,0.18)',  color: '#f59e0b' },
+    green:  { bg: 'rgba(16,185,129,0.18)',  color: '#10b981' },
+    red:    { bg: 'rgba(239,68,68,0.18)',   color: '#ef4444' },
 };
 
 const StatCard = ({ label, value, sub, icon, color = 'blue' }) => {
     const ic = iconBg[color] || iconBg.blue;
+    const { dark } = useTheme();
+    
     return (
         <div className={`glass-card stat-card-${color} anim-enter rounded-2xl p-5 flex flex-col gap-4 cursor-default`}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -204,61 +226,61 @@ const StatCard = ({ label, value, sub, icon, color = 'blue' }) => {
                 }}>
                     {icon}
                 </div>
-                <ChevronRight size={14} style={{ color: 'rgba(148,163,184,0.35)', marginTop: 2 }} />
+                <ChevronRight size={14} style={{ color: dark ? 'rgba(148,163,184,0.35)' : 'rgba(51,65,85,0.35)', marginTop: 2 }} />
             </div>
             <div>
-                <div style={{ fontSize: 28, fontWeight: 800, color: '#f1f5f9', lineHeight: 1.1, letterSpacing: '-0.02em' }}>{value}</div>
-                <div style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'rgba(148,163,184,0.7)', marginTop: 3 }}>{label}</div>
-                <div style={{ fontSize: 12, color: 'rgba(148,163,184,0.55)', marginTop: 2 }}>{sub}</div>
+                <div style={{ fontSize: 28, fontWeight: 800, color: dark ? '#f1f5f9' : '#0f172a', lineHeight: 1.1, letterSpacing: '-0.02em' }}>{value}</div>
+                <div style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: dark ? 'rgba(148,163,184,0.7)' : 'rgba(51,65,85,0.7)', marginTop: 3 }}>{label}</div>
+                <div style={{ fontSize: 12, color: dark ? 'rgba(148,163,184,0.55)' : 'rgba(51,65,85,0.55)', marginTop: 2 }}>{sub}</div>
             </div>
         </div>
     );
 };
 
 /* ─── TabBar ─────────────────────────────────────────────────────────────── */
-const TabBar = ({ tabs, active, onChange }) => (
-    <div style={{
-        display: 'flex', gap: 4, padding: '5px', borderRadius: 16,
-        background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)',
-        backdropFilter: 'blur(12px)', flexWrap: 'wrap',
-    }}>
-        {tabs.map(t => (
-            <button
-                key={t.id}
-                onClick={() => onChange(t.id)}
-                style={{
-                    flex: '1 1 auto', padding: '8px 18px', borderRadius: 11,
-                    border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600,
-                    fontFamily: 'Outfit, sans-serif',
-                    transition: 'all 0.25s cubic-bezier(0.22,1,0.36,1)',
-                    ...(active === t.id
-                        ? { color: '#fff', background: 'linear-gradient(135deg,rgba(168,85,247,0.90),rgba(99,102,241,0.90))', boxShadow: '0 0 20px rgba(168,85,247,0.45), 0 4px 12px rgba(99,102,241,0.30)' }
-                        : { color: 'rgba(148,163,184,0.75)', background: 'transparent' }),
-                }}
-            >
-                {t.label}
-            </button>
-        ))}
-    </div>
-);
-
-/* ─── SectionHeader ──────────────────────────────────────────────────────── */
-const SectionHeader = ({ title }) => (
-    <div className="section-title" style={{ marginBottom: 16 }}>
-        <span style={{ fontSize: 14, fontWeight: 700, color: '#f1f5f9', letterSpacing: '-0.01em' }}>{title}</span>
-    </div>
-);
+const TabBar = ({ tabs, active, onChange }) => {
+    const { dark } = useTheme();
+    return (
+        <div style={{
+            display: 'flex', gap: 4, padding: '5px', borderRadius: 16,
+            background: dark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.02)',
+            border: `1px solid ${dark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.05)'}`,
+            backdropFilter: 'blur(12px)', flexWrap: 'wrap',
+        }}>
+            {tabs.map(t => (
+                <button
+                    key={t.id}
+                    onClick={() => onChange(t.id)}
+                    style={{
+                        flex: '1 1 auto', padding: '8px 18px', borderRadius: 11,
+                        border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600,
+                        fontFamily: 'Outfit, sans-serif',
+                        transition: 'all 0.25s cubic-bezier(0.22,1,0.36,1)',
+                        ...(active === t.id
+                            ? { color: '#fff', background: 'linear-gradient(135deg,rgba(168,85,247,0.90),rgba(99,102,241,0.90))', boxShadow: '0 0 20px rgba(168,85,247,0.45), 0 4px 12px rgba(99,102,241,0.30)' }
+                            : { color: dark ? 'rgba(148,163,184,0.75)' : 'rgba(51,65,85,0.75)', background: 'transparent' }),
+                    }}
+                >
+                    {t.label}
+                </button>
+            ))}
+        </div>
+    );
+};
 
 /* ─── InfoBanner ─────────────────────────────────────────────────────────── */
-const InfoBanner = ({ icon, title, desc }) => (
-    <div className="alert-banner-red anim-enter rounded-2xl p-4" style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
-        <div style={{ flexShrink: 0, marginTop: 1 }}>{icon}</div>
-        <div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: '#fca5a5', marginBottom: 3 }}>{title}</div>
-            <div style={{ fontSize: 12, color: 'rgba(252,165,165,0.75)', lineHeight: 1.5 }}>{desc}</div>
+const InfoBanner = ({ icon, title, desc }) => {
+    const { dark } = useTheme();
+    return (
+        <div className="alert-banner-red anim-enter rounded-2xl p-4" style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
+            <div style={{ flexShrink: 0, marginTop: 1 }}>{icon}</div>
+            <div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#ef4444', marginBottom: 3 }}>{title}</div>
+                <div style={{ fontSize: 12, color: dark ? 'rgba(148,163,184,0.75)' : 'rgba(51,65,85,0.75)', lineHeight: 1.5 }}>{desc}</div>
+            </div>
         </div>
-    </div>
-);
+    );
+};
 
 /* ─── HRModule ───────────────────────────────────────────────────────────── */
 export function HRModule() {
@@ -275,7 +297,7 @@ export function HRModule() {
 
     return (
         <div className="hr-module" style={{ display: 'flex', flexDirection: 'column', gap: 20, width: '100%' }}>
-            <GlobalStyles />
+            <GlobalStyles dark={dark} />
             <TabBar tabs={tabs} active={tab} onChange={setTab} />
 
             {/* ── Staff Directory ── */}
@@ -289,8 +311,10 @@ export function HRModule() {
                     </div>
 
                     <div className="glass-card anim-enter" style={{ borderRadius: 20, overflow: 'hidden' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '18px 24px', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-                            <SectionHeader title="Staff Directory" />
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '18px 24px', borderBottom: `1px solid ${dark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.05)'}` }}>
+                            <div className="section-title" style={{ marginBottom: 0, justifyContent: 'flex-start', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
+                                <span style={{ fontSize: 14, fontWeight: 700, color: dark ? '#f1f5f9' : '#0f172a', letterSpacing: '-0.01em' }}>Staff Directory</span>
+                            </div>
                             <button className="add-btn" style={{ padding: '8px 18px', borderRadius: 10, border: 'none', color: '#fff', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'Outfit,sans-serif' }}>
                                 + Add Staff
                             </button>
@@ -298,15 +322,15 @@ export function HRModule() {
                         <div className="hr-scroll" style={{ overflowX: 'auto' }}>
                             <table style={{ width: '100%', minWidth: 700, borderCollapse: 'collapse', textAlign: 'left' }}>
                                 <thead>
-                                    <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', background: 'rgba(255,255,255,0.02)' }}>
+                                    <tr style={{ borderBottom: `1px solid ${dark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)'}`, background: dark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.01)' }}>
                                         {["Name","Role","Site","Type","License Exp.","Status"].map(h => (
-                                            <th key={h} style={{ padding: '12px 20px', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(148,163,184,0.55)' }}>{h}</th>
+                                            <th key={h} style={{ padding: '12px 20px', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: dark ? 'rgba(148,163,184,0.55)' : 'rgba(51,65,85,0.55)' }}>{h}</th>
                                         ))}
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {mockData.staff.map((s, idx) => (
-                                        <tr key={s.id} className="hr-row" style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', cursor: 'pointer' }}>
+                                        <tr key={s.id} className="hr-row" style={{ borderBottom: `1px solid ${dark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)'}`, cursor: 'pointer' }}>
                                             <td style={{ padding: '14px 20px' }}>
                                                 <div className="avatar-wrap" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                                                     <div className="avatar-ring" style={{
@@ -317,13 +341,13 @@ export function HRModule() {
                                                     }}>
                                                         {s.name.split(" ").map(n=>n[0]).join("").slice(0,2)}
                                                     </div>
-                                                    <span style={{ fontSize: 13, fontWeight: 600, color: '#f1f5f9' }}>{s.name}</span>
+                                                    <span style={{ fontSize: 13, fontWeight: 600, color: dark ? '#f1f5f9' : '#0f172a' }}>{s.name}</span>
                                                 </div>
                                             </td>
-                                            <td style={{ padding: '14px 20px', fontSize: 13, color: 'rgba(148,163,184,0.7)', fontWeight: 500 }}>{s.role}</td>
+                                            <td style={{ padding: '14px 20px', fontSize: 13, color: dark ? 'rgba(148,163,184,0.7)' : 'rgba(51,65,85,0.7)', fontWeight: 500 }}>{s.role}</td>
                                             <td style={{ padding: '14px 20px' }}><Badge color="blue">{s.site.split(" ")[0]}</Badge></td>
                                             <td style={{ padding: '14px 20px' }}><Badge color={s.type==="Provider"?"purple":s.type==="Admin"?"cyan":"gray"}>{s.type}</Badge></td>
-                                            <td style={{ padding: '14px 20px', fontSize: 13, color: 'rgba(148,163,184,0.65)', fontFamily: 'JetBrains Mono,monospace' }}>{s.license}</td>
+                                            <td style={{ padding: '14px 20px', fontSize: 13, color: dark ? 'rgba(148,163,184,0.65)' : 'rgba(51,65,85,0.65)', fontFamily: 'JetBrains Mono,monospace' }}>{s.license}</td>
                                             <td style={{ padding: '14px 20px' }}><Badge color={s.status==="Active"?"green":"amber"}>{s.status}</Badge></td>
                                         </tr>
                                     ))}
@@ -345,42 +369,44 @@ export function HRModule() {
                     </div>
 
                     <InfoBanner
-                        icon={<ShieldAlert size={22} color="#f87171" strokeWidth={1.5}/>}
+                        icon={<ShieldAlert size={22} color="#ef4444" strokeWidth={1.5}/>}
                         title="Revenue Impact Alert"
                         desc="Dr. Chen board certification expired 87 days ago — estimated impact: $18,400/month if not resolved."
-                        color="red"
                     />
 
                     <div className="glass-card anim-enter" style={{ borderRadius: 20, overflow: 'hidden' }}>
-                        <div style={{ padding: '18px 24px', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-                            <SectionHeader title="Credentialing Tracker" />
+                        <div style={{ padding: '18px 24px', borderBottom: `1px solid ${dark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.05)'}` }}>
+                            <div className="section-title" style={{ marginBottom: 0, justifyContent: 'flex-start', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
+                                <span style={{ fontSize: 14, fontWeight: 700, color: dark ? '#f1f5f9' : '#0f172a', letterSpacing: '-0.01em' }}>Credentialing Tracker</span>
+                            </div>
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column' }}>
                             {mockData.credentialing.map((c, i) => {
                                 const cfg = {
-                                    critical: { badge:'red',   label:'EXPIRED',     bg:'rgba(239,68,68,0.06)'    },
-                                    warning:  { badge:'amber', label:`${c.daysLeft}d`, bg:'rgba(245,158,11,0.06)' },
-                                    pending:  { badge:'blue',  label:'PENDING',     bg:'rgba(59,130,246,0.06)'   },
-                                    ok:       { badge:'green', label:`${c.daysLeft}d`, bg:'transparent'          },
+                                    critical: { badge:'red',   label:'EXPIRED',     bg: dark ? 'rgba(239,68,68,0.06)' : 'rgba(239,68,68,0.03)' },
+                                    warning:  { badge:'amber', label:`${c.daysLeft}d`, bg: dark ? 'rgba(245,158,11,0.06)' : 'rgba(245,158,11,0.03)' },
+                                    pending:  { badge:'blue',  label:'PENDING',     bg: dark ? 'rgba(59,130,246,0.06)' : 'rgba(59,130,246,0.03)' },
+                                    ok:       { badge:'green', label:`${c.daysLeft}d`, bg: 'transparent' },
                                 }[c.status];
 
                                 return (
                                     <div key={i} className="hr-row" style={{
                                         display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center',
-                                        padding: '14px 24px', gap: 14, borderBottom: '1px solid rgba(255,255,255,0.04)',
+                                        padding: '14px 24px', gap: 14, borderBottom: `1px solid ${dark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)'}`,
                                         background: cfg.bg, cursor: 'pointer',
                                     }}>
                                         <div style={{ flex: 1, minWidth: 0 }}>
-                                            <div style={{ fontSize: 13, fontWeight: 600, color: '#f1f5f9', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.item}</div>
-                                            <div style={{ fontSize: 12, color: 'rgba(148,163,184,0.6)', marginTop: 2 }}>{c.provider}</div>
+                                            <div style={{ fontSize: 13, fontWeight: 600, color: dark ? '#f1f5f9' : '#0f172a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.item}</div>
+                                            <div style={{ fontSize: 12, color: dark ? 'rgba(148,163,184,0.6)' : 'rgba(51,65,85,0.6)', marginTop: 2 }}>{c.provider}</div>
                                         </div>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                                            <span style={{ fontSize: 12, color: 'rgba(148,163,184,0.55)', fontFamily: 'JetBrains Mono,monospace', whiteSpace: 'nowrap' }}>{c.expiry || '—'}</span>
+                                            <span style={{ fontSize: 12, color: dark ? 'rgba(148,163,184,0.55)' : 'rgba(51,65,85,0.55)', fontFamily: 'JetBrains Mono,monospace', whiteSpace: 'nowrap' }}>{c.expiry || '—'}</span>
                                             <Badge color={cfg.badge}>{cfg.label}</Badge>
                                             <button className="manage-btn" style={{
                                                 fontSize: 11, fontWeight: 600, padding: '5px 14px', borderRadius: 8, cursor: 'pointer',
-                                                background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.10)',
-                                                color: '#cbd5e1', fontFamily: 'Outfit,sans-serif',
+                                                background: dark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
+                                                border: `1px solid ${dark ? 'rgba(255,255,255,0.10)' : 'rgba(0,0,0,0.05)'}`,
+                                                color: dark ? '#cbd5e1' : '#334155', fontFamily: 'Outfit,sans-serif',
                                             }}>
                                                 Manage
                                             </button>
@@ -403,19 +429,22 @@ export function HRModule() {
                     </div>
 
                     <div className="glass-card anim-enter" style={{ borderRadius: 20, overflow: 'hidden' }}>
-                        <div style={{ padding: '18px 24px', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-                            <SectionHeader title="Provider Compensation Overview" />
+                        <div style={{ padding: '18px 24px', borderBottom: `1px solid ${dark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.05)'}` }}>
+                            <div className="section-title" style={{ marginBottom: 0, justifyContent: 'flex-start', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
+                                <span style={{ fontSize: 14, fontWeight: 700, color: dark ? '#f1f5f9' : '#0f172a', letterSpacing: '-0.01em' }}>Provider Compensation Overview</span>
+                            </div>
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', padding: '12px 16px', gap: 10 }}>
                             {mockData.revenueByProvider.map(p => (
                                 <div key={p.name} className="hr-row" style={{
                                     display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center',
                                     padding: '14px 16px', borderRadius: 14, gap: 14, cursor: 'pointer',
-                                    background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)',
+                                    background: dark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
+                                    border: `1px solid ${dark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)'}`,
                                     transition: 'background 0.2s ease, border-color 0.2s ease',
                                 }}
-                                    onMouseEnter={e => { e.currentTarget.style.background='rgba(99,102,241,0.08)'; e.currentTarget.style.borderColor='rgba(99,102,241,0.25)'; }}
-                                    onMouseLeave={e => { e.currentTarget.style.background='rgba(255,255,255,0.03)'; e.currentTarget.style.borderColor='rgba(255,255,255,0.06)'; }}
+                                    onMouseEnter={e => { e.currentTarget.style.background = dark ? 'rgba(99,102,241,0.08)' : 'rgba(99,102,241,0.04)'; e.currentTarget.style.borderColor = 'rgba(99,102,241,0.25)'; }}
+                                    onMouseLeave={e => { e.currentTarget.style.background = dark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)'; e.currentTarget.style.borderColor = dark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)'; }}
                                 >
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
                                         <div style={{
@@ -426,17 +455,17 @@ export function HRModule() {
                                             {p.name.split(" ").map(n=>n[0]).slice(0,2).join("")}
                                         </div>
                                         <div>
-                                            <div style={{ fontSize: 14, fontWeight: 700, color: '#f1f5f9' }}>{p.name}</div>
-                                            <div style={{ fontSize: 12, color: 'rgba(148,163,184,0.55)', marginTop: 2 }}>Base salary + productivity bonus</div>
+                                            <div style={{ fontSize: 14, fontWeight: 700, color: dark ? '#f1f5f9' : '#0f172a' }}>{p.name}</div>
+                                            <div style={{ fontSize: 12, color: dark ? 'rgba(148,163,184,0.55)' : 'rgba(51,65,85,0.55)', marginTop: 2 }}>Base salary + productivity bonus</div>
                                         </div>
                                     </div>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
                                         <div style={{ textAlign: 'right' }}>
-                                            <div className="hr-mono" style={{ fontSize: 15, fontWeight: 700, color: '#f1f5f9' }}>
-                                                {fmtK(p.expenses)}<span style={{ fontSize: 11, color: 'rgba(148,163,184,0.45)' }}>/mo</span>
+                                            <div className="hr-mono" style={{ fontSize: 15, fontWeight: 700, color: dark ? '#f1f5f9' : '#0f172a' }}>
+                                                {fmtK(p.expenses)}<span style={{ fontSize: 11, color: dark ? 'rgba(148,163,184,0.45)' : 'rgba(51,65,85,0.45)' }}>/mo</span>
                                             </div>
-                                            <div style={{ fontSize: 11, color: 'rgba(148,163,184,0.5)', marginTop: 2 }}>
-                                                wRVU: <span style={{ color: '#cbd5e1', fontFamily: 'JetBrains Mono,monospace' }}>{p.rvu.toLocaleString()}</span>
+                                            <div style={{ fontSize: 11, color: dark ? 'rgba(148,163,184,0.5)' : 'rgba(51,65,85,0.5)', marginTop: 2 }}>
+                                                wRVU: <span style={{ color: dark ? '#cbd5e1' : '#334155', fontFamily: 'JetBrains Mono,monospace' }}>{p.rvu.toLocaleString()}</span>
                                             </div>
                                         </div>
                                         <Badge color="green">Active</Badge>
@@ -459,10 +488,12 @@ export function HRModule() {
                     </div>
 
                     <div className="glass-card anim-enter" style={{ borderRadius: 20, padding: '22px 24px' }}>
-                        <SectionHeader title="Coverage Calendar — March 2026" />
+                        <div className="section-title" style={{ marginBottom: 16, justifyContent: 'flex-start', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
+                            <span style={{ fontSize: 14, fontWeight: 700, color: dark ? '#f1f5f9' : '#0f172a', letterSpacing: '-0.01em' }}>Coverage Calendar — March 2026</span>
+                        </div>
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 8, marginBottom: 8 }}>
                             {["Mon","Tue","Wed","Thu","Fri"].map(d => (
-                                <div key={d} style={{ textAlign: 'center', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(148,163,184,0.45)', paddingBottom: 8 }}>{d}</div>
+                                <div key={d} style={{ textAlign: 'center', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: dark ? 'rgba(148,163,184,0.45)' : 'rgba(51,65,85,0.45)', paddingBottom: 8 }}>{d}</div>
                             ))}
                         </div>
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 8 }}>
@@ -472,11 +503,11 @@ export function HRModule() {
                                     <div key={i} className={`cal-day ${pto ? 'cal-day-pto' : ''}`} style={{
                                         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
                                         padding: '14px 8px', borderRadius: 12, cursor: 'pointer',
-                                        border: `1px solid ${pto ? 'rgba(99,102,241,0.30)' : 'rgba(255,255,255,0.06)'}`,
-                                        background: pto ? 'rgba(99,102,241,0.14)' : 'rgba(255,255,255,0.02)',
+                                        border: `1px solid ${pto ? 'rgba(99,102,241,0.30)' : (dark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)')}`,
+                                        background: pto ? 'rgba(99,102,241,0.14)' : (dark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.01)'),
                                     }}>
-                                        <span style={{ fontSize: 14, fontWeight: 600, color: pto ? '#a5b4fc' : 'rgba(148,163,184,0.65)' }}>{i+1}</span>
-                                        {pto && <span style={{ fontSize: 9, fontWeight: 700, color: '#818cf8', marginTop: 4, letterSpacing: '0.1em', textTransform: 'uppercase' }}>PTO</span>}
+                                        <span style={{ fontSize: 14, fontWeight: 600, color: pto ? (dark ? '#a5b4fc' : '#818cf8') : (dark ? 'rgba(148,163,184,0.65)' : 'rgba(51,65,85,0.65)') }}>{i+1}</span>
+                                        {pto && <span style={{ fontSize: 9, fontWeight: 700, color: dark ? '#818cf8' : '#6366f1', marginTop: 4, letterSpacing: '0.1em', textTransform: 'uppercase' }}>PTO</span>}
                                     </div>
                                 );
                             })}
@@ -488,7 +519,9 @@ export function HRModule() {
             {/* ── Training ── */}
             {tab === "training" && (
                 <div key="training" className="glass-card anim-enter" style={{ borderRadius: 20, padding: '22px 24px', marginBottom: 24 }}>
-                    <SectionHeader title="Training & Compliance Status" />
+                    <div className="section-title" style={{ marginBottom: 16, justifyContent: 'flex-start', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
+                        <span style={{ fontSize: 14, fontWeight: 700, color: dark ? '#f1f5f9' : '#0f172a', letterSpacing: '-0.01em' }}>Training & Compliance Status</span>
+                    </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                         {[
                             { name: "HIPAA Privacy & Security",    completed: 21, total: 23, due: "2026-04-01" },
@@ -499,24 +532,22 @@ export function HRModule() {
                         ].map((tr, idx) => {
                             const pct = tr.completed / tr.total;
                             const done = tr.completed === tr.total;
-                            const barColor = done ? '#34d399' : pct > 0.8 ? '#fbbf24' : '#6366f1';
+                            const barColor = done ? '#10b981' : pct > 0.8 ? '#f59e0b' : '#6366f1';
                             return (
                                 <div key={tr.name} className="training-card" style={{
                                     padding: '16px 18px', borderRadius: 14,
-                                    background: 'rgba(255,255,255,0.03)',
-                                    border: '1px solid rgba(255,255,255,0.07)',
                                     animationDelay: `${idx * 60}ms`,
                                 }}>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, flexWrap: 'wrap', gap: 8 }}>
-                                        <span style={{ fontSize: 13, fontWeight: 700, color: '#f1f5f9' }}>{tr.name}</span>
+                                        <span style={{ fontSize: 13, fontWeight: 700, color: dark ? '#f1f5f9' : '#0f172a' }}>{tr.name}</span>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                                            <span className="hr-mono" style={{ fontSize: 12, fontWeight: 600, color: 'rgba(148,163,184,0.6)' }}>{tr.completed}/{tr.total}</span>
+                                            <span className="hr-mono" style={{ fontSize: 12, fontWeight: 600, color: dark ? 'rgba(148,163,184,0.6)' : 'rgba(51,65,85,0.6)' }}>{tr.completed}/{tr.total}</span>
                                             <Badge color={done ? 'green' : pct > 0.8 ? 'amber' : 'red'}>
                                                 {done ? 'Complete' : `${Math.round(pct*100)}%`}
                                             </Badge>
                                         </div>
                                     </div>
-                                    <div style={{ height: 6, borderRadius: 999, background: 'rgba(255,255,255,0.06)', overflow: 'hidden' }}>
+                                    <div style={{ height: 6, borderRadius: 999, background: dark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.03)', overflow: 'hidden' }}>
                                         <div style={{
                                             height: '100%', borderRadius: 999,
                                             width: `${pct * 100}%`,
@@ -525,7 +556,7 @@ export function HRModule() {
                                             transition: 'width 0.9s cubic-bezier(0.22,1,0.36,1)',
                                         }} />
                                     </div>
-                                    <div style={{ fontSize: 11, color: 'rgba(148,163,184,0.45)', marginTop: 8 }}>Due: {tr.due}</div>
+                                    <div style={{ fontSize: 11, color: dark ? 'rgba(148,163,184,0.45)' : 'rgba(51,65,85,0.45)', marginTop: 8 }}>Due: {tr.due}</div>
                                 </div>
                             );
                         })}

@@ -9,25 +9,43 @@ const fmtK = (n) => n >= 1000000 ? `$${(n / 1000000).toFixed(2)}M` : `$${(n / 10
 const fmtCurrency = (n) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(n);
 
 /* ─── Global Styles ───────────────────────────────────────────────────── */
-const GlobalStyles = () => (
+const GlobalStyles = ({ dark }) => (
     <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
         .fin-module * { font-family: 'Outfit', sans-serif; }
         .fin-mono { font-family: 'JetBrains Mono', monospace !important; }
 
-        /* Glass card base */
+        /* Glass card base - dynamic based on theme */
         .fin-glass {
-            background: rgba(255,255,255,0.04);
+            background: ${dark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.02)'};
             backdrop-filter: blur(20px) saturate(160%);
             -webkit-backdrop-filter: blur(20px) saturate(160%);
-            border: 1px solid rgba(255,255,255,0.08);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.06);
+            border: 1px solid ${dark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'};
+            box-shadow: ${dark 
+                ? '0 8px 32px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.06)'
+                : '0 8px 32px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.5)'};
             transition: box-shadow 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
         }
         .fin-glass:hover {
-            box-shadow: 0 16px 48px rgba(0,0,0,0.36), inset 0 1px 0 rgba(255,255,255,0.10);
-            border-color: rgba(255,255,255,0.13);
+            box-shadow: ${dark 
+                ? '0 16px 48px rgba(0,0,0,0.36), inset 0 1px 0 rgba(255,255,255,0.10)'
+                : '0 16px 48px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.5)'};
+            border-color: ${dark ? 'rgba(255,255,255,0.13)' : 'rgba(0,0,0,0.08)'};
+        }
+
+        /* Text colors based on theme */
+        .fin-text-primary {
+            color: ${dark ? '#f1f5f9' : '#0f172a'} !important;
+        }
+        .fin-text-secondary {
+            color: ${dark ? 'rgba(148,163,184,0.75)' : 'rgba(51,65,85,0.75)'} !important;
+        }
+        .fin-text-tertiary {
+            color: ${dark ? 'rgba(148,163,184,0.45)' : 'rgba(51,65,85,0.45)'} !important;
+        }
+        .fin-text-muted {
+            color: ${dark ? 'rgba(148,163,184,0.35)' : 'rgba(51,65,85,0.35)'} !important;
         }
 
         /* Stat card per-color glows */
@@ -67,15 +85,15 @@ const GlobalStyles = () => (
 
         /* Import banner */
         .fin-import-banner {
-            background: rgba(59,130,246,0.09);
-            border: 1px solid rgba(59,130,246,0.22);
+            background: ${dark ? 'rgba(59,130,246,0.09)' : 'rgba(59,130,246,0.03)'};
+            border: 1px solid ${dark ? 'rgba(59,130,246,0.22)' : 'rgba(59,130,246,0.15)'};
             backdrop-filter: blur(12px);
-            box-shadow: 0 4px 20px rgba(59,130,246,0.10), inset 0 1px 0 rgba(255,255,255,0.04);
+            box-shadow: 0 4px 20px rgba(59,130,246,0.10), inset 0 1px 0 ${dark ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.5)'};
             transition: border-color 0.3s ease, box-shadow 0.3s ease;
         }
         .fin-import-banner:hover {
             border-color: rgba(59,130,246,0.38);
-            box-shadow: 0 6px 28px rgba(59,130,246,0.18), inset 0 1px 0 rgba(255,255,255,0.06);
+            box-shadow: 0 6px 28px rgba(59,130,246,0.18), inset 0 1px 0 ${dark ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.5)'};
         }
 
         /* Import button */
@@ -97,6 +115,8 @@ const GlobalStyles = () => (
         /* Provider bar card */
         .fin-provider-card {
             transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+            background: ${dark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)'};
+            border: 1px solid ${dark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.05)'};
         }
         .fin-provider-card:hover {
             border-color: rgba(59,130,246,0.35) !important;
@@ -107,6 +127,8 @@ const GlobalStyles = () => (
         /* Expense category card */
         .fin-exp-card {
             transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
+            background: ${dark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)'};
+            border: 1px solid ${dark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.05)'};
         }
         .fin-exp-card:hover {
             border-color: rgba(99,102,241,0.40) !important;
@@ -118,7 +140,9 @@ const GlobalStyles = () => (
         .fin-ar-row {
             transition: background 0.18s ease, border-color 0.18s ease;
         }
-        .fin-ar-row:hover { background: rgba(255,255,255,0.04) !important; }
+        .fin-ar-row:hover { 
+            background: ${dark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.02)'} !important; 
+        }
 
         /* Projection card */
         .fin-proj-card {
@@ -133,6 +157,8 @@ const GlobalStyles = () => (
         /* Benchmark card */
         .fin-bench-card {
             transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
+            background: ${dark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)'};
+            border: 1px solid ${dark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.05)'};
         }
         .fin-bench-card:hover {
             border-color: rgba(245,158,11,0.40) !important;
@@ -150,14 +176,19 @@ const GlobalStyles = () => (
         /* Amber alert banner */
         .fin-alert-amber {
             border-left: 3px solid rgba(245,158,11,0.80);
-            background: rgba(245,158,11,0.08);
+            background: ${dark ? 'rgba(245,158,11,0.08)' : 'rgba(245,158,11,0.03)'};
             backdrop-filter: blur(12px);
-            box-shadow: 0 4px 20px rgba(245,158,11,0.10), inset 0 1px 0 rgba(255,255,255,0.04);
+            box-shadow: 0 4px 20px rgba(245,158,11,0.10), inset 0 1px 0 ${dark ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.5)'};
         }
 
         /* Cash flow summary row */
-        .fin-cf-row { transition: background 0.15s ease; border-bottom: 1px solid rgba(255,255,255,0.06); }
-        .fin-cf-row:hover { background: rgba(255,255,255,0.03); }
+        .fin-cf-row { 
+            transition: background 0.15s ease; 
+            border-bottom: 1px solid ${dark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)'}; 
+        }
+        .fin-cf-row:hover { 
+            background: ${dark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.01)'}; 
+        }
 
         /* Scrollbar */
         .fin-scroll::-webkit-scrollbar { width: 4px; }
@@ -168,13 +199,13 @@ const GlobalStyles = () => (
 
 /* ─── Badge ───────────────────────────────────────────────────────────── */
 const colorMap = {
-    green:  { bg: 'rgba(16,185,129,0.15)',  text: '#34d399', border: 'rgba(16,185,129,0.30)' },
-    blue:   { bg: 'rgba(59,130,246,0.15)',  text: '#60a5fa', border: 'rgba(59,130,246,0.30)' },
-    cyan:   { bg: 'rgba(6,182,212,0.15)',   text: '#22d3ee', border: 'rgba(6,182,212,0.30)' },
-    amber:  { bg: 'rgba(245,158,11,0.15)',  text: '#fbbf24', border: 'rgba(245,158,11,0.30)' },
-    purple: { bg: 'rgba(168,85,247,0.15)',  text: '#c084fc', border: 'rgba(168,85,247,0.30)' },
-    red:    { bg: 'rgba(239,68,68,0.15)',   text: '#f87171', border: 'rgba(239,68,68,0.30)' },
-    gray:   { bg: 'rgba(148,163,184,0.12)', text: '#94a3b8', border: 'rgba(148,163,184,0.25)' },
+    green:  { bg: 'rgba(16,185,129,0.15)',  text: '#10b981', border: 'rgba(16,185,129,0.30)' },
+    blue:   { bg: 'rgba(59,130,246,0.15)',  text: '#3b82f6', border: 'rgba(59,130,246,0.30)' },
+    cyan:   { bg: 'rgba(6,182,212,0.15)',   text: '#06b6d4', border: 'rgba(6,182,212,0.30)' },
+    amber:  { bg: 'rgba(245,158,11,0.15)',  text: '#f59e0b', border: 'rgba(245,158,11,0.30)' },
+    purple: { bg: 'rgba(168,85,247,0.15)',  text: '#a855f7', border: 'rgba(168,85,247,0.30)' },
+    red:    { bg: 'rgba(239,68,68,0.15)',   text: '#ef4444', border: 'rgba(239,68,68,0.30)' },
+    gray:   { bg: 'rgba(148,163,184,0.12)', text: '#64748b', border: 'rgba(148,163,184,0.25)' },
 };
 const Badge = ({ color = 'gray', children }) => {
     const c = colorMap[color] || colorMap.gray;
@@ -192,18 +223,20 @@ const Badge = ({ color = 'gray', children }) => {
 
 /* ─── Icon colours ────────────────────────────────────────────────────── */
 const iconBg = {
-    green:  { bg: 'rgba(16,185,129,0.18)',  color: '#34d399' },
-    blue:   { bg: 'rgba(59,130,246,0.18)',  color: '#60a5fa' },
-    cyan:   { bg: 'rgba(6,182,212,0.18)',   color: '#22d3ee' },
-    amber:  { bg: 'rgba(245,158,11,0.18)',  color: '#fbbf24' },
-    purple: { bg: 'rgba(168,85,247,0.18)',  color: '#c084fc' },
-    red:    { bg: 'rgba(239,68,68,0.18)',   color: '#f87171' },
+    green:  { bg: 'rgba(16,185,129,0.18)',  color: '#10b981' },
+    blue:   { bg: 'rgba(59,130,246,0.18)',  color: '#3b82f6' },
+    cyan:   { bg: 'rgba(6,182,212,0.18)',   color: '#06b6d4' },
+    amber:  { bg: 'rgba(245,158,11,0.18)',  color: '#f59e0b' },
+    purple: { bg: 'rgba(168,85,247,0.18)',  color: '#a855f7' },
+    red:    { bg: 'rgba(239,68,68,0.18)',   color: '#ef4444' },
 };
 
 /* ─── StatCard ────────────────────────────────────────────────────────── */
 const StatCard = ({ label, value, sub, icon, color = 'blue', trend }) => {
     const ic = iconBg[color] || iconBg.blue;
     const trendPos = trend > 0;
+    const { dark } = useTheme();
+    
     return (
         <div className={`fin-glass fin-stat-${color} fin-enter rounded-2xl p-5 flex flex-col gap-4 cursor-default`}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -216,7 +249,7 @@ const StatCard = ({ label, value, sub, icon, color = 'blue', trend }) => {
                 {trend !== undefined && (
                     <div style={{
                         display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, fontWeight: 700,
-                        color: trendPos ? '#34d399' : '#f87171',
+                        color: trendPos ? '#10b981' : '#ef4444',
                         background: trendPos ? 'rgba(16,185,129,0.12)' : 'rgba(239,68,68,0.12)',
                         padding: '3px 8px', borderRadius: 999,
                         border: `1px solid ${trendPos ? 'rgba(16,185,129,0.25)' : 'rgba(239,68,68,0.25)'}`,
@@ -227,73 +260,86 @@ const StatCard = ({ label, value, sub, icon, color = 'blue', trend }) => {
                 )}
             </div>
             <div>
-                <div className="fin-mono" style={{ fontSize: 26, fontWeight: 800, color: '#f1f5f9', lineHeight: 1.1, letterSpacing: '-0.02em' }}>{value}</div>
-                <div style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'rgba(148,163,184,0.65)', marginTop: 3 }}>{label}</div>
-                <div style={{ fontSize: 12, color: 'rgba(148,163,184,0.50)', marginTop: 2 }}>{sub}</div>
+                <div className="fin-mono" style={{ fontSize: 26, fontWeight: 800, color: dark ? '#f1f5f9' : '#0f172a', lineHeight: 1.1, letterSpacing: '-0.02em' }}>{value}</div>
+                <div style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: dark ? 'rgba(148,163,184,0.65)' : 'rgba(51,65,85,0.65)', marginTop: 3 }}>{label}</div>
+                <div style={{ fontSize: 12, color: dark ? 'rgba(148,163,184,0.50)' : 'rgba(51,65,85,0.50)', marginTop: 2 }}>{sub}</div>
             </div>
         </div>
     );
 };
 
 /* ─── TabBar ──────────────────────────────────────────────────────────── */
-const TabBar = ({ tabs, active, onChange }) => (
-    <div style={{
-        display: 'flex', gap: 4, padding: '5px', borderRadius: 16,
-        background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)',
-        backdropFilter: 'blur(12px)', flexWrap: 'wrap',
-    }}>
-        {tabs.map(t => (
-            <button key={t.id} onClick={() => onChange(t.id)} style={{
-                flex: '1 1 auto', padding: '8px 18px', borderRadius: 11, border: 'none', cursor: 'pointer',
-                fontSize: 13, fontWeight: 600, fontFamily: 'Outfit, sans-serif',
-                transition: 'all 0.25s cubic-bezier(0.22,1,0.36,1)',
-                ...(active === t.id
-                    ? { color: '#fff', background: 'linear-gradient(135deg,rgba(59,130,246,0.90),rgba(99,102,241,0.90))', boxShadow: '0 0 20px rgba(59,130,246,0.45),0 4px 12px rgba(99,102,241,0.28)' }
-                    : { color: 'rgba(148,163,184,0.75)', background: 'transparent' }),
-            }}>{t.label}</button>
-        ))}
-    </div>
-);
+const TabBar = ({ tabs, active, onChange }) => {
+    const { dark } = useTheme();
+    return (
+        <div style={{
+            display: 'flex', gap: 4, padding: '5px', borderRadius: 16,
+            background: dark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.02)',
+            border: `1px solid ${dark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.05)'}`,
+            backdropFilter: 'blur(12px)', flexWrap: 'wrap',
+        }}>
+            {tabs.map(t => (
+                <button key={t.id} onClick={() => onChange(t.id)} style={{
+                    flex: '1 1 auto', padding: '8px 18px', borderRadius: 11, border: 'none', cursor: 'pointer',
+                    fontSize: 13, fontWeight: 600, fontFamily: 'Outfit, sans-serif',
+                    transition: 'all 0.25s cubic-bezier(0.22,1,0.36,1)',
+                    ...(active === t.id
+                        ? { color: '#fff', background: 'linear-gradient(135deg,rgba(59,130,246,0.90),rgba(99,102,241,0.90))', boxShadow: '0 0 20px rgba(59,130,246,0.45),0 4px 12px rgba(99,102,241,0.28)' }
+                        : { color: dark ? 'rgba(148,163,184,0.75)' : 'rgba(51,65,85,0.75)', background: 'transparent' }),
+                }}>{t.label}</button>
+            ))}
+        </div>
+    );
+};
 
 /* ─── SectionHeader ───────────────────────────────────────────────────── */
-const SectionHeader = ({ title, right }) => (
-    <div className="fin-section-title" style={{ marginBottom: 16, justifyContent: 'space-between' }}>
-        <span style={{ fontSize: 14, fontWeight: 700, color: '#f1f5f9', letterSpacing: '-0.01em' }}>{title}</span>
-        {right && <div>{right}</div>}
-    </div>
-);
+const SectionHeader = ({ title, right }) => {
+    const { dark } = useTheme();
+    return (
+        <div className="fin-section-title" style={{ marginBottom: 16, justifyContent: 'space-between' }}>
+            <span style={{ fontSize: 14, fontWeight: 700, color: dark ? '#f1f5f9' : '#0f172a', letterSpacing: '-0.01em' }}>{title}</span>
+            {right && <div>{right}</div>}
+        </div>
+    );
+};
 
 /* ─── Import Banner ───────────────────────────────────────────────────── */
-const ImportBanner = () => (
-    <div className="fin-import-banner fin-enter rounded-2xl" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, padding: '14px 20px', flexWrap: 'wrap' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-            <div style={{
-                width: 40, height: 40, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                background: 'rgba(59,130,246,0.18)', color: '#60a5fa', flexShrink: 0,
-            }}>
-                <FolderDown size={20} strokeWidth={1.5} />
+const ImportBanner = () => {
+    const { dark } = useTheme();
+    return (
+        <div className="fin-import-banner fin-enter rounded-2xl" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, padding: '14px 20px', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                <div style={{
+                    width: 40, height: 40, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    background: 'rgba(59,130,246,0.18)', color: '#3b82f6', flexShrink: 0,
+                }}>
+                    <FolderDown size={20} strokeWidth={1.5} />
+                </div>
+                <div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: '#3b82f6', marginBottom: 2 }}>Data Import Engine Active</div>
+                    <div style={{ fontSize: 12, color: dark ? 'rgba(148,163,184,0.60)' : 'rgba(51,65,85,0.60)' }}>Upload CSV, Excel, or PDF billing reports — inbox watching active.</div>
+                </div>
             </div>
-            <div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: '#93c5fd', marginBottom: 2 }}>Data Import Engine Active</div>
-                <div style={{ fontSize: 12, color: 'rgba(147,197,253,0.60)' }}>Upload CSV, Excel, or PDF billing reports — inbox watching active.</div>
-            </div>
+            <button className="fin-import-btn" style={{ padding: '8px 20px', borderRadius: 10, border: 'none', color: '#fff', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'Outfit,sans-serif', whiteSpace: 'nowrap' }}>
+                Import Data
+            </button>
         </div>
-        <button className="fin-import-btn" style={{ padding: '8px 20px', borderRadius: 10, border: 'none', color: '#fff', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'Outfit,sans-serif', whiteSpace: 'nowrap' }}>
-            Import Data
-        </button>
-    </div>
-);
+    );
+};
 
 /* ─── Alert Banner ────────────────────────────────────────────────────── */
-const AlertBanner = ({ icon, title, desc }) => (
-    <div className="fin-alert-amber fin-enter rounded-2xl p-4" style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
-        <div style={{ flexShrink: 0, marginTop: 1 }}>{icon}</div>
-        <div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: '#fcd34d', marginBottom: 3 }}>{title}</div>
-            <div style={{ fontSize: 12, color: 'rgba(252,211,77,0.65)', lineHeight: 1.5 }}>{desc}</div>
+const AlertBanner = ({ icon, title, desc }) => {
+    const { dark } = useTheme();
+    return (
+        <div className="fin-alert-amber fin-enter rounded-2xl p-4" style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
+            <div style={{ flexShrink: 0, marginTop: 1 }}>{icon}</div>
+            <div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#f59e0b', marginBottom: 3 }}>{title}</div>
+                <div style={{ fontSize: 12, color: dark ? 'rgba(148,163,184,0.65)' : 'rgba(51,65,85,0.65)', lineHeight: 1.5 }}>{desc}</div>
+            </div>
         </div>
-    </div>
-);
+    );
+};
 
 /* ─── FinancialModule ─────────────────────────────────────────────────── */
 export function FinancialModule() {
@@ -310,7 +356,7 @@ export function FinancialModule() {
 
     return (
         <div className="fin-module" style={{ display: 'flex', flexDirection: 'column', gap: 20, width: '100%' }}>
-            <GlobalStyles />
+            <GlobalStyles dark={dark} />
             <TabBar tabs={tabs} active={tab} onChange={setTab} />
             <ImportBanner />
 
@@ -327,35 +373,41 @@ export function FinancialModule() {
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(300px,1fr))', gap: 16 }}>
                         {/* Cash Position Trend */}
                         <div className="fin-glass fin-enter rounded-2xl p-6" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                            <SectionHeader title="Cash Position Trend (8 Months)" />
+                            {/* <SectionHeader title="Cash Position Trend (8 Months)" /> */}
+                            <div className="fin-section-title" style={{ marginBottom: 16, justifyContent: 'flex-start', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
+    <span style={{ fontSize: 14, fontWeight: 700, color: dark ? '#f1f5f9' : '#0f172a', letterSpacing: '-0.01em' }}>Cash Position Trend (8 Months)</span>
+</div>
                             <div style={{ width: '100%', height: 96, marginBottom: 4 }}>
                                 <MiniBarChart data={mockData.cashPosition.trend} height={96} />
                             </div>
                             <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
                                 {["Aug","Sep","Oct","Nov","Dec","Jan","Feb","Mar"].map(m => (
-                                    <span key={m} className="fin-mono" style={{ fontSize: 10, fontWeight: 500, color: 'rgba(148,163,184,0.45)', textAlign: 'center', flex: 1 }}>{m}</span>
+                                    <span key={m} className="fin-mono" style={{ fontSize: 10, fontWeight: 500, color: dark ? 'rgba(148,163,184,0.45)' : 'rgba(51,65,85,0.45)', textAlign: 'center', flex: 1 }}>{m}</span>
                                 ))}
                             </div>
                         </div>
 
                         {/* Cash Flow Summary */}
                         <div className="fin-glass fin-enter rounded-2xl p-6" style={{ display: 'flex', flexDirection: 'column' }}>
-                            <SectionHeader title="Cash Flow Summary — Feb 2026" />
+                            {/* <SectionHeader title="Cash Flow Summary — Feb 2026" /> */}
+                            <div className="fin-section-title" style={{ marginBottom: 16, justifyContent: 'flex-start', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
+    <span style={{ fontSize: 14, fontWeight: 700, color: dark ? '#f1f5f9' : '#0f172a', letterSpacing: '-0.01em' }}>Cash Flow Summary — Feb 2026</span>
+</div>
                             <div style={{ display: 'flex', flexDirection: 'column', flex: 1, justifyContent: 'center' }}>
                                 {[
-                                    { label: "Total Revenue",  value: fmtCurrency(445500), color: '#34d399' },
-                                    { label: "Total Expenses", value: fmtCurrency(295000), color: '#f87171' },
+                                    { label: "Total Revenue",  value: fmtCurrency(445500), color: '#10b981' },
+                                    { label: "Total Expenses", value: fmtCurrency(295000), color: '#ef4444' },
                                 ].map(row => (
                                     <div key={row.label} className="fin-cf-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 0' }}>
-                                        <span style={{ fontSize: 14, fontWeight: 500, color: 'rgba(148,163,184,0.75)' }}>{row.label}</span>
+                                        <span style={{ fontSize: 14, fontWeight: 500, color: dark ? 'rgba(148,163,184,0.75)' : 'rgba(51,65,85,0.75)' }}>{row.label}</span>
                                         <span className="fin-mono" style={{ fontSize: 15, fontWeight: 700, color: row.color, letterSpacing: '-0.02em' }}>{row.value}</span>
                                     </div>
                                 ))}
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 20, marginTop: 4 }}>
-                                    <span style={{ fontSize: 15, fontWeight: 800, color: '#f1f5f9' }}>Net Income</span>
+                                    <span style={{ fontSize: 15, fontWeight: 800, color: dark ? '#f1f5f9' : '#0f172a' }}>Net Income</span>
                                     <span className="fin-mono" style={{
-                                        fontSize: 22, fontWeight: 800, color: '#34d399', letterSpacing: '-0.02em',
-                                        textShadow: '0 0 20px rgba(52,211,153,0.35)',
+                                        fontSize: 22, fontWeight: 800, color: '#10b981', letterSpacing: '-0.02em',
+                                        textShadow: dark ? '0 0 20px rgba(16,185,129,0.35)' : 'none',
                                     }}>{fmtCurrency(150500)}</span>
                                 </div>
                             </div>
@@ -385,11 +437,11 @@ export function FinancialModule() {
                                                     boxShadow: `0 0 8px ${p.color}80`,
                                                     flexShrink: 0,
                                                 }} />
-                                                <span style={{ fontSize: 13, fontWeight: 600, color: '#cbd5e1' }}>{p.name}</span>
+                                                <span style={{ fontSize: 13, fontWeight: 600, color: dark ? '#cbd5e1' : '#334155' }}>{p.name}</span>
                                             </div>
                                             <div style={{ textAlign: 'right' }}>
-                                                <div className="fin-mono" style={{ fontSize: 13, fontWeight: 700, color: '#f1f5f9' }}>{p.value}%</div>
-                                                <div style={{ fontSize: 11, color: 'rgba(148,163,184,0.50)' }}>{fmtK(p.amount)}</div>
+                                                <div className="fin-mono" style={{ fontSize: 13, fontWeight: 700, color: dark ? '#f1f5f9' : '#0f172a' }}>{p.value}%</div>
+                                                <div style={{ fontSize: 11, color: dark ? 'rgba(148,163,184,0.50)' : 'rgba(51,65,85,0.50)' }}>{fmtK(p.amount)}</div>
                                             </div>
                                         </div>
                                     ))}
@@ -404,23 +456,22 @@ export function FinancialModule() {
                                 {mockData.revenueByProvider.map(p => (
                                     <div key={p.name} className="fin-provider-card" style={{
                                         padding: '12px 14px', borderRadius: 12, cursor: 'pointer',
-                                        background: 'rgba(255,255,255,0.03)',
-                                        border: '1px solid rgba(255,255,255,0.07)',
                                     }}>
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                                            <span style={{ fontSize: 14, fontWeight: 700, color: '#f1f5f9' }}>{p.name}</span>
-                                            <span className="fin-mono" style={{ fontSize: 14, fontWeight: 700, color: '#34d399', letterSpacing: '-0.01em' }}>{fmtK(p.revenue)}</span>
+                                            <span style={{ fontSize: 14, fontWeight: 700, color: dark ? '#f1f5f9' : '#0f172a' }}>{p.name}</span>
+                                            <span className="fin-mono" style={{ fontSize: 14, fontWeight: 700, color: '#10b981', letterSpacing: '-0.01em' }}>{fmtK(p.revenue)}</span>
                                         </div>
                                         <div style={{ display: 'flex', gap: 8, marginBottom: 10 }}>
                                             {[`wRVU: ${p.rvu.toLocaleString()}`, `Exp: ${fmtK(p.expenses)}`].map(tag => (
                                                 <span key={tag} style={{
-                                                    fontSize: 11, fontWeight: 500, color: 'rgba(148,163,184,0.55)',
-                                                    background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)',
+                                                    fontSize: 11, fontWeight: 500, color: dark ? 'rgba(148,163,184,0.55)' : 'rgba(51,65,85,0.55)',
+                                                    background: dark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
+                                                    border: `1px solid ${dark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'}`,
                                                     padding: '2px 8px', borderRadius: 6,
                                                 }}>{tag}</span>
                                             ))}
                                         </div>
-                                        <div style={{ height: 5, borderRadius: 999, background: 'rgba(255,255,255,0.07)', overflow: 'hidden' }}>
+                                        <div style={{ height: 5, borderRadius: 999, background: dark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.05)', overflow: 'hidden' }}>
                                             <div style={{
                                                 height: '100%', borderRadius: 999,
                                                 width: `${(p.revenue / 124500) * 100}%`,
@@ -462,13 +513,11 @@ export function FinancialModule() {
                             {mockData.expenses.categories.map((c, idx) => (
                                 <div key={c.name} className="fin-exp-card" style={{
                                     padding: '16px', borderRadius: 14,
-                                    background: 'rgba(255,255,255,0.03)',
-                                    border: '1px solid rgba(255,255,255,0.07)',
                                     animationDelay: `${idx * 50}ms`,
                                 }}>
-                                    <div className="fin-mono" style={{ fontSize: 22, fontWeight: 800, color: '#f1f5f9', letterSpacing: '-0.02em', marginBottom: 4 }}>{fmtK(c.amount)}</div>
-                                    <div style={{ fontSize: 13, fontWeight: 600, color: 'rgba(148,163,184,0.60)', marginBottom: 12 }}>{c.name}</div>
-                                    <div style={{ height: 5, borderRadius: 999, background: 'rgba(255,255,255,0.07)', overflow: 'hidden' }}>
+                                    <div className="fin-mono" style={{ fontSize: 22, fontWeight: 800, color: dark ? '#f1f5f9' : '#0f172a', letterSpacing: '-0.02em', marginBottom: 4 }}>{fmtK(c.amount)}</div>
+                                    <div style={{ fontSize: 13, fontWeight: 600, color: dark ? 'rgba(148,163,184,0.60)' : 'rgba(51,65,85,0.60)', marginBottom: 12 }}>{c.name}</div>
+                                    <div style={{ height: 5, borderRadius: 999, background: dark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.05)', overflow: 'hidden' }}>
                                         <div style={{
                                             height: '100%', borderRadius: 999,
                                             width: `${(c.amount / 380000) * 100}%`,
@@ -500,13 +549,13 @@ export function FinancialModule() {
                             {mockData.arAging.map(b => (
                                 <div key={b.bucket} className="fin-ar-row" style={{ padding: '10px 12px', borderRadius: 12, cursor: 'default' }}>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                                        <span style={{ fontSize: 14, fontWeight: 700, color: '#f1f5f9' }}>{b.bucket}</span>
+                                        <span style={{ fontSize: 14, fontWeight: 700, color: dark ? '#f1f5f9' : '#0f172a' }}>{b.bucket}</span>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                                            <span style={{ fontSize: 12, fontWeight: 500, color: 'rgba(148,163,184,0.55)', minWidth: 32, textAlign: 'right' }}>{b.pct}%</span>
-                                            <span className="fin-mono" style={{ fontSize: 14, fontWeight: 700, color: '#f1f5f9', minWidth: 70, textAlign: 'right', letterSpacing: '-0.01em' }}>{fmtK(b.amount)}</span>
+                                            <span style={{ fontSize: 12, fontWeight: 500, color: dark ? 'rgba(148,163,184,0.55)' : 'rgba(51,65,85,0.55)', minWidth: 32, textAlign: 'right' }}>{b.pct}%</span>
+                                            <span className="fin-mono" style={{ fontSize: 14, fontWeight: 700, color: dark ? '#f1f5f9' : '#0f172a', minWidth: 70, textAlign: 'right', letterSpacing: '-0.01em' }}>{fmtK(b.amount)}</span>
                                         </div>
                                     </div>
-                                    <div style={{ height: 7, borderRadius: 999, background: 'rgba(255,255,255,0.06)', overflow: 'hidden' }}>
+                                    <div style={{ height: 7, borderRadius: 999, background: dark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.03)', overflow: 'hidden' }}>
                                         <div style={{
                                             height: '100%', borderRadius: 999,
                                             width: `${b.pct}%`,
@@ -520,7 +569,7 @@ export function FinancialModule() {
                         </div>
                         <div style={{ marginTop: 20 }}>
                             <AlertBanner
-                                icon={<AlertTriangle size={22} color="#fbbf24" strokeWidth={1.5}/>}
+                                icon={<AlertTriangle size={22} color="#f59e0b" strokeWidth={1.5}/>}
                                 title="AR days at 38.2 — above 35-day target"
                                 desc={`${fmtK(mockData.arAging[3].amount + mockData.arAging[4].amount)} in 91+ days bucket requires active escalation with payors.`}
                             />
@@ -539,14 +588,14 @@ export function FinancialModule() {
                             { label: "90-Day Forecast", value: fmtK(1640000), trend: "+27.6%" },
                         ].map(f => (
                             <div key={f.label} className="fin-glass fin-proj-card fin-enter rounded-2xl p-6" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 10, cursor: 'default' }}>
-                                <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(148,163,184,0.55)' }}>{f.label}</div>
-                                <div className="fin-mono" style={{ fontSize: 30, fontWeight: 800, color: '#f1f5f9', letterSpacing: '-0.03em', lineHeight: 1 }}>{f.value}</div>
+                                <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: dark ? 'rgba(148,163,184,0.55)' : 'rgba(51,65,85,0.55)' }}>{f.label}</div>
+                                <div className="fin-mono" style={{ fontSize: 30, fontWeight: 800, color: dark ? '#f1f5f9' : '#0f172a', letterSpacing: '-0.03em', lineHeight: 1 }}>{f.value}</div>
                                 <span style={{
-                                    fontSize: 13, fontWeight: 700, color: '#34d399',
+                                    fontSize: 13, fontWeight: 700, color: '#10b981',
                                     background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.25)',
                                     padding: '4px 12px', borderRadius: 999,
                                 }}>{f.trend} vs today</span>
-                                <p style={{ fontSize: 11, color: 'rgba(148,163,184,0.40)', lineHeight: 1.5, marginTop: 4 }}>Based on historical run-rate + contracted revenue</p>
+                                <p style={{ fontSize: 11, color: dark ? 'rgba(148,163,184,0.40)' : 'rgba(51,65,85,0.40)', lineHeight: 1.5, marginTop: 4 }}>Based on historical run-rate + contracted revenue</p>
                             </div>
                         ))}
                     </div>
@@ -562,19 +611,17 @@ export function FinancialModule() {
                             ].map((b, idx) => (
                                 <div key={b.metric} className="fin-bench-card fin-enter" style={{
                                     padding: '16px', borderRadius: 14,
-                                    background: 'rgba(255,255,255,0.03)',
-                                    border: '1px solid rgba(255,255,255,0.07)',
                                     animationDelay: `${idx * 60}ms`,
                                 }}>
-                                    <div style={{ fontSize: 12, fontWeight: 600, color: 'rgba(148,163,184,0.55)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{b.metric}</div>
-                                    <div className="fin-mono" style={{ fontSize: 24, fontWeight: 800, color: '#f1f5f9', letterSpacing: '-0.02em', marginBottom: 12 }}>{b.yours}</div>
+                                    <div style={{ fontSize: 12, fontWeight: 600, color: dark ? 'rgba(148,163,184,0.55)' : 'rgba(51,65,85,0.55)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{b.metric}</div>
+                                    <div className="fin-mono" style={{ fontSize: 24, fontWeight: 800, color: dark ? '#f1f5f9' : '#0f172a', letterSpacing: '-0.02em', marginBottom: 12 }}>{b.yours}</div>
                                     <div style={{
                                         paddingTop: 12,
-                                        borderTop: '1px solid rgba(255,255,255,0.06)',
+                                        borderTop: `1px solid ${dark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)'}`,
                                         display: 'flex', alignItems: 'center', gap: 6, fontSize: 12,
                                     }}>
-                                        <span style={{ color: 'rgba(148,163,184,0.45)' }}>Benchmark:</span>
-                                        <span style={{ fontWeight: 700, color: '#fbbf24' }}>{b.benchmark}</span>
+                                        <span style={{ color: dark ? 'rgba(148,163,184,0.45)' : 'rgba(51,65,85,0.45)' }}>Benchmark:</span>
+                                        <span style={{ fontWeight: 700, color: '#f59e0b' }}>{b.benchmark}</span>
                                     </div>
                                 </div>
                             ))}
