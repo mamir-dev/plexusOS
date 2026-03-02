@@ -1,105 +1,387 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTheme } from '../App';
-import { StatCard, Card, SectionHeader, TabBar, InfoBanner, Badge } from '../components/Shared';
 import { mockData } from '../mockData';
-import { Users, FileCheck, DollarSign, Calendar, GraduationCap, AlertCircle, Clock, ShieldAlert, CheckCircle } from 'lucide-react';
+import { Users, FileCheck, DollarSign, Calendar, GraduationCap, AlertCircle, Clock, ShieldAlert, CheckCircle, ChevronRight, Sparkles } from 'lucide-react';
 
+/* ─── Utility ──────────────────────────────────────────────────────────── */
 const fmtK = (n) => n >= 1000000 ? `$${(n / 1000000).toFixed(2)}M` : `$${(n / 1000).toFixed(0)}K`;
 
+/* ─── Injected global styles (glassmorphism + custom animations) ────────── */
+const GlobalStyles = () => (
+    <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+        .hr-module * { font-family: 'Outfit', sans-serif; }
+        .hr-mono { font-family: 'JetBrains Mono', monospace !important; }
+
+        /* Glassmorphism card */
+        .glass-card {
+            background: rgba(255,255,255,0.04);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.06);
+            transition: box-shadow 0.3s ease, transform 0.3s ease, border-color 0.3s ease;
+        }
+        .glass-card:hover {
+            box-shadow: 0 16px 48px rgba(0,0,0,0.36), inset 0 1px 0 rgba(255,255,255,0.1);
+            border-color: rgba(255,255,255,0.14);
+        }
+
+        /* Stat card glow on hover */
+        .stat-card-purple:hover  { box-shadow: 0 0 0 1px rgba(168,85,247,0.35), 0 12px 40px rgba(168,85,247,0.18); }
+        .stat-card-blue:hover    { box-shadow: 0 0 0 1px rgba(59,130,246,0.35), 0 12px 40px rgba(59,130,246,0.18); }
+        .stat-card-cyan:hover    { box-shadow: 0 0 0 1px rgba(6,182,212,0.35),  0 12px 40px rgba(6,182,212,0.18); }
+        .stat-card-amber:hover   { box-shadow: 0 0 0 1px rgba(245,158,11,0.35), 0 12px 40px rgba(245,158,11,0.18); }
+        .stat-card-green:hover   { box-shadow: 0 0 0 1px rgba(16,185,129,0.35), 0 12px 40px rgba(16,185,129,0.18); }
+        .stat-card-red:hover     { box-shadow: 0 0 0 1px rgba(239,68,68,0.35),  0 12px 40px rgba(239,68,68,0.18); }
+
+        /* Tab active glow */
+        .tab-active-glow {
+            background: linear-gradient(135deg, rgba(168,85,247,0.90) 0%, rgba(99,102,241,0.90) 100%);
+            box-shadow: 0 0 24px rgba(168,85,247,0.50), 0 4px 16px rgba(99,102,241,0.35);
+        }
+
+        /* Smooth fade-slide-in */
+        @keyframes fadeSlideIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .anim-enter { animation: fadeSlideIn 0.35s cubic-bezier(0.22,1,0.36,1) both; }
+
+        /* Stagger children */
+        .stagger > *:nth-child(1) { animation-delay: 0ms; }
+        .stagger > *:nth-child(2) { animation-delay: 60ms; }
+        .stagger > *:nth-child(3) { animation-delay: 120ms; }
+        .stagger > *:nth-child(4) { animation-delay: 180ms; }
+        .stagger > *:nth-child(5) { animation-delay: 240ms; }
+
+        /* Progress bar shimmer */
+        @keyframes shimmer {
+            from { background-position: -200% center; }
+            to   { background-position: 200% center; }
+        }
+        .progress-shine {
+            background: linear-gradient(90deg, currentColor 0%, rgba(255,255,255,0.65) 50%, currentColor 100%);
+            background-size: 200% auto;
+            animation: shimmer 2.4s linear infinite;
+        }
+
+        /* Row hover */
+        .hr-row {
+            transition: background 0.18s ease, transform 0.18s ease;
+        }
+        .hr-row:hover { transform: translateX(2px); }
+
+        /* Avatar ring pulse on hover */
+        .avatar-wrap:hover .avatar-ring {
+            box-shadow: 0 0 0 3px rgba(99,102,241,0.55);
+        }
+        .avatar-ring {
+            transition: box-shadow 0.25s ease;
+        }
+
+        /* Badge transitions */
+        .hr-badge {
+            transition: filter 0.2s ease, transform 0.2s ease;
+        }
+        .hr-badge:hover { filter: brightness(1.15); transform: scale(1.05); }
+
+        /* Manage button */
+        .manage-btn {
+            transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+        }
+        .manage-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(99,102,241,0.28);
+        }
+
+        /* Calendar day */
+        .cal-day {
+            transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .cal-day:hover { transform: scale(1.07); }
+        .cal-day-pto:hover { box-shadow: 0 0 16px rgba(99,102,241,0.40); }
+
+        /* Add Staff button */
+        .add-btn {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            transition: opacity 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 4px 14px rgba(99,102,241,0.40);
+        }
+        .add-btn:hover {
+            opacity: 0.92;
+            transform: translateY(-1px);
+            box-shadow: 0 8px 24px rgba(99,102,241,0.55);
+        }
+        .add-btn:active { transform: translateY(0); }
+
+        /* Section heading line */
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section-title::before {
+            content: '';
+            display: block;
+            width: 4px;
+            height: 18px;
+            border-radius: 2px;
+            background: linear-gradient(180deg,#8b5cf6,#6366f1);
+            flex-shrink: 0;
+        }
+
+        /* Alert banner glow */
+        .alert-banner-red {
+            border-left: 3px solid rgba(239,68,68,0.8);
+            background: rgba(239,68,68,0.08);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 4px 20px rgba(239,68,68,0.12), inset 0 1px 0 rgba(255,255,255,0.05);
+        }
+
+        /* Training card */
+        .training-card {
+            transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
+        }
+        .training-card:hover {
+            border-color: rgba(99,102,241,0.45) !important;
+            box-shadow: 0 4px 20px rgba(99,102,241,0.12);
+            transform: translateX(3px);
+        }
+
+        /* Scroll thin */
+        .hr-scroll::-webkit-scrollbar { height: 4px; }
+        .hr-scroll::-webkit-scrollbar-track { background: transparent; }
+        .hr-scroll::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.35); border-radius: 99px; }
+    `}</style>
+);
+
+/* ─── Badge ─────────────────────────────────────────────────────────────── */
+const colorMap = {
+    purple: { bg: 'rgba(168,85,247,0.15)', text: '#c084fc', border: 'rgba(168,85,247,0.30)' },
+    blue:   { bg: 'rgba(59,130,246,0.15)',  text: '#60a5fa', border: 'rgba(59,130,246,0.30)' },
+    cyan:   { bg: 'rgba(6,182,212,0.15)',   text: '#22d3ee', border: 'rgba(6,182,212,0.30)' },
+    green:  { bg: 'rgba(16,185,129,0.15)',  text: '#34d399', border: 'rgba(16,185,129,0.30)' },
+    amber:  { bg: 'rgba(245,158,11,0.15)',  text: '#fbbf24', border: 'rgba(245,158,11,0.30)' },
+    red:    { bg: 'rgba(239,68,68,0.15)',   text: '#f87171', border: 'rgba(239,68,68,0.30)' },
+    gray:   { bg: 'rgba(148,163,184,0.12)', text: '#94a3b8', border: 'rgba(148,163,184,0.25)' },
+};
+
+const Badge = ({ color = 'gray', children }) => {
+    const c = colorMap[color] || colorMap.gray;
+    return (
+        <span className="hr-badge" style={{
+            display: 'inline-flex', alignItems: 'center', padding: '2px 10px',
+            borderRadius: '999px', fontSize: '11px', fontWeight: 600,
+            letterSpacing: '0.02em', whiteSpace: 'nowrap',
+            background: c.bg, color: c.text,
+            border: `1px solid ${c.border}`,
+        }}>
+            {children}
+        </span>
+    );
+};
+
+/* ─── StatCard ───────────────────────────────────────────────────────────── */
+const iconBg = {
+    purple: { bg: 'rgba(168,85,247,0.18)', color: '#c084fc' },
+    blue:   { bg: 'rgba(59,130,246,0.18)',  color: '#60a5fa' },
+    cyan:   { bg: 'rgba(6,182,212,0.18)',   color: '#22d3ee' },
+    amber:  { bg: 'rgba(245,158,11,0.18)',  color: '#fbbf24' },
+    green:  { bg: 'rgba(16,185,129,0.18)',  color: '#34d399' },
+    red:    { bg: 'rgba(239,68,68,0.18)',   color: '#f87171' },
+};
+
+const StatCard = ({ label, value, sub, icon, color = 'blue' }) => {
+    const ic = iconBg[color] || iconBg.blue;
+    return (
+        <div className={`glass-card stat-card-${color} anim-enter rounded-2xl p-5 flex flex-col gap-4 cursor-default`}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <div style={{
+                    width: 42, height: 42, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    background: ic.bg, color: ic.color, flexShrink: 0,
+                }}>
+                    {icon}
+                </div>
+                <ChevronRight size={14} style={{ color: 'rgba(148,163,184,0.35)', marginTop: 2 }} />
+            </div>
+            <div>
+                <div style={{ fontSize: 28, fontWeight: 800, color: '#f1f5f9', lineHeight: 1.1, letterSpacing: '-0.02em' }}>{value}</div>
+                <div style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'rgba(148,163,184,0.7)', marginTop: 3 }}>{label}</div>
+                <div style={{ fontSize: 12, color: 'rgba(148,163,184,0.55)', marginTop: 2 }}>{sub}</div>
+            </div>
+        </div>
+    );
+};
+
+/* ─── TabBar ─────────────────────────────────────────────────────────────── */
+const TabBar = ({ tabs, active, onChange }) => (
+    <div style={{
+        display: 'flex', gap: 4, padding: '5px', borderRadius: 16,
+        background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)',
+        backdropFilter: 'blur(12px)', flexWrap: 'wrap',
+    }}>
+        {tabs.map(t => (
+            <button
+                key={t.id}
+                onClick={() => onChange(t.id)}
+                style={{
+                    flex: '1 1 auto', padding: '8px 18px', borderRadius: 11,
+                    border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600,
+                    fontFamily: 'Outfit, sans-serif',
+                    transition: 'all 0.25s cubic-bezier(0.22,1,0.36,1)',
+                    ...(active === t.id
+                        ? { color: '#fff', background: 'linear-gradient(135deg,rgba(168,85,247,0.90),rgba(99,102,241,0.90))', boxShadow: '0 0 20px rgba(168,85,247,0.45), 0 4px 12px rgba(99,102,241,0.30)' }
+                        : { color: 'rgba(148,163,184,0.75)', background: 'transparent' }),
+                }}
+            >
+                {t.label}
+            </button>
+        ))}
+    </div>
+);
+
+/* ─── SectionHeader ──────────────────────────────────────────────────────── */
+const SectionHeader = ({ title }) => (
+    <div className="section-title" style={{ marginBottom: 16 }}>
+        <span style={{ fontSize: 14, fontWeight: 700, color: '#f1f5f9', letterSpacing: '-0.01em' }}>{title}</span>
+    </div>
+);
+
+/* ─── InfoBanner ─────────────────────────────────────────────────────────── */
+const InfoBanner = ({ icon, title, desc }) => (
+    <div className="alert-banner-red anim-enter rounded-2xl p-4" style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
+        <div style={{ flexShrink: 0, marginTop: 1 }}>{icon}</div>
+        <div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: '#fca5a5', marginBottom: 3 }}>{title}</div>
+            <div style={{ fontSize: 12, color: 'rgba(252,165,165,0.75)', lineHeight: 1.5 }}>{desc}</div>
+        </div>
+    </div>
+);
+
+/* ─── HRModule ───────────────────────────────────────────────────────────── */
 export function HRModule() {
     const { dark } = useTheme();
     const [tab, setTab] = useState("directory");
+
     const tabs = [
-        { id: "directory", label: "Staff Directory" }, { id: "credentialing", label: "Credentialing" },
-        { id: "payroll", label: "Payroll & Comp" }, { id: "coverage", label: "Coverage & PTO" },
-        { id: "training", label: "Training" },
+        { id: "directory",     label: "Staff Directory" },
+        { id: "credentialing", label: "Credentialing"   },
+        { id: "payroll",       label: "Payroll & Comp"  },
+        { id: "coverage",      label: "Coverage & PTO"  },
+        { id: "training",      label: "Training"        },
     ];
 
     return (
-        <div className="flex flex-col gap-5 w-full animate-in fade-in zoom-in-95 duration-300">
-            <TabBar tabs={tabs} active={tab} onChange={setTab} accent="purple" />
+        <div className="hr-module" style={{ display: 'flex', flexDirection: 'column', gap: 20, width: '100%' }}>
+            <GlobalStyles />
+            <TabBar tabs={tabs} active={tab} onChange={setTab} />
 
+            {/* ── Staff Directory ── */}
             {tab === "directory" && (
-                <div className="flex flex-col gap-4 w-full">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
-                        <StatCard label="Total Staff" value="23" sub="Across 4 sites" icon={<Users size={20} />} color="purple" />
-                        <StatCard label="Providers" value="8" sub="MD/NP/PA" icon={<FileCheck size={20} />} color="blue" />
-                        <StatCard label="Admin Staff" value="11" sub="Non-clinical" icon={<Calendar size={20} />} color="cyan" />
-                        <StatCard label="Credentialing" value="1" sub="Tom Bradley — NP" icon={<Clock size={20} />} color="amber" />
+                <div key="directory" style={{ display: 'flex', flexDirection: 'column', gap: 16 }} className="anim-enter">
+                    <div className="stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px,1fr))', gap: 14 }}>
+                        <StatCard label="Total Staff"    value="23"  sub="Across 4 sites" icon={<Users size={20}/>}     color="purple" />
+                        <StatCard label="Providers"      value="8"   sub="MD/NP/PA"        icon={<FileCheck size={20}/>}  color="blue"   />
+                        <StatCard label="Admin Staff"    value="11"  sub="Non-clinical"    icon={<Calendar size={20}/>}   color="cyan"   />
+                        <StatCard label="Credentialing"  value="1"   sub="Tom Bradley — NP" icon={<Clock size={20}/>}    color="amber"  />
                     </div>
-                    <Card className="w-full">
-                        <div className="flex flex-col sm:flex-row justify-between sm:items-center p-4 sm:p-5 border-b border-slate-200 dark:border-slate-800/80 gap-3">
-                            <span className="text-sm font-bold text-slate-900 dark:text-slate-100">Staff Directory</span>
-                            <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold transition-colors duration-200 shadow-sm w-full sm:w-auto">
+
+                    <div className="glass-card anim-enter" style={{ borderRadius: 20, overflow: 'hidden' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '18px 24px', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+                            <SectionHeader title="Staff Directory" />
+                            <button className="add-btn" style={{ padding: '8px 18px', borderRadius: 10, border: 'none', color: '#fff', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'Outfit,sans-serif' }}>
                                 + Add Staff
                             </button>
                         </div>
-                        <div className="overflow-x-auto w-full">
-                            <table className="w-full min-w-[700px] border-collapse text-left">
+                        <div className="hr-scroll" style={{ overflowX: 'auto' }}>
+                            <table style={{ width: '100%', minWidth: 700, borderCollapse: 'collapse', textAlign: 'left' }}>
                                 <thead>
-                                    <tr className="border-b border-slate-200 dark:border-slate-800/80 bg-slate-50 dark:bg-[#1E293B]/20">
-                                        {["Name", "Role", "Site", "Type", "License Exp.", "Status"].map(h => (
-                                            <th key={h} className="px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-slate-500">{h}</th>
+                                    <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', background: 'rgba(255,255,255,0.02)' }}>
+                                        {["Name","Role","Site","Type","License Exp.","Status"].map(h => (
+                                            <th key={h} style={{ padding: '12px 20px', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(148,163,184,0.55)' }}>{h}</th>
                                         ))}
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
-                                    {mockData.staff.map(s => (
-                                        <tr key={s.id} className="hover:bg-slate-50 dark:hover:bg-[#1E293B]/40 transition-colors duration-150 group cursor-pointer">
-                                            <td className="px-4 py-3">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-8 h-8 rounded-full flex justify-center items-center text-xs font-bold text-white shrink-0 shadow-sm group-hover:scale-105 transition-transform" style={{ backgroundColor: `hsl(${s.id * 47}, 55%, 45%)` }}>
-                                                        {s.name.split(" ").map(n => n[0]).join("").slice(0, 2)}
+                                <tbody>
+                                    {mockData.staff.map((s, idx) => (
+                                        <tr key={s.id} className="hr-row" style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', cursor: 'pointer' }}>
+                                            <td style={{ padding: '14px 20px' }}>
+                                                <div className="avatar-wrap" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                                                    <div className="avatar-ring" style={{
+                                                        width: 34, height: 34, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                        fontSize: 12, fontWeight: 700, color: '#fff', flexShrink: 0,
+                                                        background: `hsl(${s.id * 47},55%,45%)`,
+                                                        boxShadow: `0 2px 10px hsl(${s.id * 47},55%,30%,0.4)`,
+                                                    }}>
+                                                        {s.name.split(" ").map(n=>n[0]).join("").slice(0,2)}
                                                     </div>
-                                                    <span className="text-[13px] font-semibold text-slate-900 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{s.name}</span>
+                                                    <span style={{ fontSize: 13, fontWeight: 600, color: '#f1f5f9' }}>{s.name}</span>
                                                 </div>
                                             </td>
-                                            <td className="px-4 py-3 text-[13px] text-slate-500 dark:text-slate-400 font-medium">{s.role}</td>
-                                            <td className="px-4 py-3"><Badge color="blue">{s.site.split(" ")[0]}</Badge></td>
-                                            <td className="px-4 py-3"><Badge color={s.type === "Provider" ? "purple" : s.type === "Admin" ? "cyan" : "gray"}>{s.type}</Badge></td>
-                                            <td className="px-4 py-3 text-[13px] text-slate-500 dark:text-slate-400">{s.license}</td>
-                                            <td className="px-4 py-3"><Badge color={s.status === "Active" ? "green" : "amber"}>{s.status}</Badge></td>
+                                            <td style={{ padding: '14px 20px', fontSize: 13, color: 'rgba(148,163,184,0.7)', fontWeight: 500 }}>{s.role}</td>
+                                            <td style={{ padding: '14px 20px' }}><Badge color="blue">{s.site.split(" ")[0]}</Badge></td>
+                                            <td style={{ padding: '14px 20px' }}><Badge color={s.type==="Provider"?"purple":s.type==="Admin"?"cyan":"gray"}>{s.type}</Badge></td>
+                                            <td style={{ padding: '14px 20px', fontSize: 13, color: 'rgba(148,163,184,0.65)', fontFamily: 'JetBrains Mono,monospace' }}>{s.license}</td>
+                                            <td style={{ padding: '14px 20px' }}><Badge color={s.status==="Active"?"green":"amber"}>{s.status}</Badge></td>
                                         </tr>
                                     ))}
                                 </tbody>
                             </table>
                         </div>
-                    </Card>
+                    </div>
                 </div>
             )}
 
+            {/* ── Credentialing ── */}
             {tab === "credentialing" && (
-                <div className="flex flex-col gap-4 w-full">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
-                        <StatCard label="Monitored Items" value="22" sub="Active licenses" icon={<CheckCircle size={20} />} color="green" />
-                        <StatCard label="Expiring Soon" value="3" sub="Within 90 days" icon={<AlertCircle size={20} />} color="amber" />
-                        <StatCard label="Expired" value="1" sub="Requires action" icon={<ShieldAlert size={20} />} color="red" />
-                        <StatCard label="Pending" value="1" sub="Tom Bradley NP" icon={<Clock size={20} />} color="blue" />
+                <div key="credentialing" style={{ display: 'flex', flexDirection: 'column', gap: 16 }} className="anim-enter">
+                    <div className="stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px,1fr))', gap: 14 }}>
+                        <StatCard label="Monitored"   value="22" sub="Active licenses"  icon={<CheckCircle size={20}/>} color="green" />
+                        <StatCard label="Expiring"    value="3"  sub="Within 90 days"   icon={<AlertCircle size={20}/>} color="amber" />
+                        <StatCard label="Expired"     value="1"  sub="Requires action"  icon={<ShieldAlert size={20}/>} color="red"   />
+                        <StatCard label="Pending"     value="1"  sub="Tom Bradley NP"   icon={<Clock size={20}/>}       color="blue"  />
                     </div>
-                    <InfoBanner icon={<ShieldAlert size={24} className="text-red-500" strokeWidth={1.5} />} title="Revenue Impact Alert" desc="Dr. Chen board certification expired 87 days ago — estimated impact: $18,400/month if not resolved." color="red" />
-                    <Card className="w-full">
-                        <div className="p-4 sm:p-5 border-b border-slate-200 dark:border-slate-800/80">
-                            <span className="text-sm font-bold text-slate-900 dark:text-slate-100">Credentialing Tracker</span>
+
+                    <InfoBanner
+                        icon={<ShieldAlert size={22} color="#f87171" strokeWidth={1.5}/>}
+                        title="Revenue Impact Alert"
+                        desc="Dr. Chen board certification expired 87 days ago — estimated impact: $18,400/month if not resolved."
+                        color="red"
+                    />
+
+                    <div className="glass-card anim-enter" style={{ borderRadius: 20, overflow: 'hidden' }}>
+                        <div style={{ padding: '18px 24px', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+                            <SectionHeader title="Credentialing Tracker" />
                         </div>
-                        <div className="flex flex-col w-full divide-y divide-slate-100 dark:divide-slate-800/50">
+                        <div style={{ display: 'flex', flexDirection: 'column' }}>
                             {mockData.credentialing.map((c, i) => {
                                 const cfg = {
-                                    critical: { badge: "red", label: "EXPIRED", bg: "bg-red-50/50 dark:bg-red-900/10" },
-                                    warning: { badge: "amber", label: `${c.daysLeft}d`, bg: "bg-amber-50/50 dark:bg-amber-900/10" },
-                                    pending: { badge: "blue", label: "PENDING", bg: "bg-blue-50/50 dark:bg-blue-900/10" },
-                                    ok: { badge: "green", label: `${c.daysLeft}d`, bg: "bg-transparent" },
+                                    critical: { badge:'red',   label:'EXPIRED',     bg:'rgba(239,68,68,0.06)'    },
+                                    warning:  { badge:'amber', label:`${c.daysLeft}d`, bg:'rgba(245,158,11,0.06)' },
+                                    pending:  { badge:'blue',  label:'PENDING',     bg:'rgba(59,130,246,0.06)'   },
+                                    ok:       { badge:'green', label:`${c.daysLeft}d`, bg:'transparent'          },
                                 }[c.status];
 
                                 return (
-                                    <div key={i} className={`flex flex-col sm:flex-row justify-between sm:items-center p-4 gap-4 w-full hover:brightness-95 dark:hover:brightness-110 transition-all cursor-pointer ${cfg.bg}`}>
-                                        <div className="flex-1 w-full min-w-0">
-                                            <div className="text-[13px] font-semibold text-slate-900 dark:text-slate-100 truncate">{c.item}</div>
-                                            <div className="text-[12px] font-medium text-slate-500 mt-0.5 truncate">{c.provider}</div>
+                                    <div key={i} className="hr-row" style={{
+                                        display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center',
+                                        padding: '14px 24px', gap: 14, borderBottom: '1px solid rgba(255,255,255,0.04)',
+                                        background: cfg.bg, cursor: 'pointer',
+                                    }}>
+                                        <div style={{ flex: 1, minWidth: 0 }}>
+                                            <div style={{ fontSize: 13, fontWeight: 600, color: '#f1f5f9', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.item}</div>
+                                            <div style={{ fontSize: 12, color: 'rgba(148,163,184,0.6)', marginTop: 2 }}>{c.provider}</div>
                                         </div>
-                                        <div className="flex items-center justify-between sm:w-auto gap-4 w-full">
-                                            <div className="text-[12px] font-medium text-slate-500 whitespace-nowrap">{c.expiry || "—"}</div>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                                            <span style={{ fontSize: 12, color: 'rgba(148,163,184,0.55)', fontFamily: 'JetBrains Mono,monospace', whiteSpace: 'nowrap' }}>{c.expiry || '—'}</span>
                                             <Badge color={cfg.badge}>{cfg.label}</Badge>
-                                            <button className="text-[11px] font-semibold px-3 py-1.5 rounded-md border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-colors shrink-0">
+                                            <button className="manage-btn" style={{
+                                                fontSize: 11, fontWeight: 600, padding: '5px 14px', borderRadius: 8, cursor: 'pointer',
+                                                background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.10)',
+                                                color: '#cbd5e1', fontFamily: 'Outfit,sans-serif',
+                                            }}>
                                                 Manage
                                             </button>
                                         </div>
@@ -107,117 +389,148 @@ export function HRModule() {
                                 );
                             })}
                         </div>
-                    </Card>
+                    </div>
                 </div>
             )}
 
+            {/* ── Payroll ── */}
             {tab === "payroll" && (
-                <div className="flex flex-col gap-4 w-full">
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full">
-                        <StatCard label="Monthly Payroll" value={fmtK(mockData.expenses.payroll)} sub="Feb 2026 total" icon={<DollarSign size={20} />} color="purple" />
-                        <StatCard label="Per Provider Avg" value={fmtK(mockData.expenses.payroll / 4)} sub="Salary + burden" icon={<Users size={20} />} color="blue" />
-                        <StatCard label="Payroll Burden" value="24.1%" sub="Benefits + taxes" icon={<FileCheck size={20} />} color="amber" />
+                <div key="payroll" style={{ display: 'flex', flexDirection: 'column', gap: 16 }} className="anim-enter">
+                    <div className="stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px,1fr))', gap: 14 }}>
+                        <StatCard label="Monthly Payroll"    value={fmtK(mockData.expenses.payroll)}      sub="Feb 2026 total"     icon={<DollarSign size={20}/>} color="purple" />
+                        <StatCard label="Per Provider Avg"   value={fmtK(mockData.expenses.payroll/4)}    sub="Salary + burden"    icon={<Users size={20}/>}     color="blue"   />
+                        <StatCard label="Payroll Burden"     value="24.1%"                                sub="Benefits + taxes"   icon={<FileCheck size={20}/>}  color="amber"  />
                     </div>
-                    <Card className="w-full">
-                        <div className="p-6 h-full flex flex-col">
+
+                    <div className="glass-card anim-enter" style={{ borderRadius: 20, overflow: 'hidden' }}>
+                        <div style={{ padding: '18px 24px', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
                             <SectionHeader title="Provider Compensation Overview" />
-                            <div className="flex flex-col gap-3 w-full mt-2">
-                                {mockData.revenueByProvider.map(p => (
-                                    <div key={p.name} className="flex flex-col sm:flex-row justify-between sm:items-center p-4 rounded-xl bg-slate-50 dark:bg-[#1E293B]/40 hover:bg-slate-100 dark:hover:bg-[#1E293B]/60 transition-colors w-full gap-4 group cursor-pointer border border-transparent hover:border-slate-200 dark:hover:border-slate-700/50">
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-10 h-10 rounded-full flex justify-center items-center text-sm font-bold text-white bg-blue-600 shadow-sm shrink-0 group-hover:scale-105 transition-transform">
-                                                {p.name.split(" ")[1][0]}
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <div className="text-[14px] font-bold text-slate-900 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{p.name}</div>
-                                                <div className="text-[12px] font-medium text-slate-500 mt-0.5 truncate">Base salary + productivity bonus</div>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center justify-between sm:w-auto gap-6 sm:text-right">
-                                            <div>
-                                                <div className="text-[14px] font-bold text-slate-900 dark:text-white font-mono tracking-tight">{fmtK(p.expenses)}<span className="text-[11px] text-slate-400">/mo</span></div>
-                                                <div className="text-[11px] font-medium text-slate-500 mt-0.5">wRVU: <span className="text-slate-700 dark:text-slate-300">{p.rvu.toLocaleString()}</span></div>
-                                            </div>
-                                            <Badge color="green">Active</Badge>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
                         </div>
-                    </Card>
-                </div>
-            )}
-
-            {tab === "coverage" && (
-                <div className="flex flex-col gap-4 w-full">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
-                        <StatCard label="PTO Requests" value="3" sub="Awaiting approval" icon={<Calendar size={20} />} color="cyan" />
-                        <StatCard label="Coverage Gaps" value="0" sub="All shifts covered" icon={<CheckCircle size={20} />} color="green" />
-                        <StatCard label="Call Schedule" value="4" sub="Providers on call" icon={<Clock size={20} />} color="blue" />
-                        <StatCard label="PTO Balance Avg" value="12.4d" sub="Across all staff" icon={<Users size={20} />} color="purple" />
-                    </div>
-                    <Card className="w-full">
-                        <div className="p-6 w-full">
-                            <SectionHeader title="Coverage Calendar — March 2026" />
-                            <div className="grid grid-cols-5 gap-2 mb-2 w-full mt-4">
-                                {["Mon", "Tue", "Wed", "Thu", "Fri"].map(d => (
-                                    <div key={d} className="text-center text-[11px] font-bold uppercase tracking-wider text-slate-400 pb-2">{d}</div>
-                                ))}
-                            </div>
-                            <div className="grid grid-cols-5 gap-2 w-full">
-                                {Array.from({ length: 20 }, (_, i) => {
-                                    const ev = [2, 7, 12, 15].includes(i);
-                                    return (
-                                        <div key={i}
-                                            className={`relative flex flex-col justify-center items-center p-3 rounded-lg text-xs font-semibold cursor-pointer transition-all duration-200 border w-full
-                        ${ev ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800/50 hover:bg-blue-100 hover:border-blue-300 dark:hover:bg-blue-900/30"
-                                                    : "bg-slate-50 dark:bg-[#1E293B]/30 text-slate-500 border-slate-100 dark:border-slate-800/50 hover:bg-slate-100 dark:hover:bg-[#1E293B]/60 hover:text-slate-700 dark:hover:text-slate-200 hover:border-slate-200 dark:hover:border-slate-700"}`}
-                                        >
-                                            <span className="text-sm">{i + 1}</span>
-                                            {ev && <span className="text-[10px] font-bold text-blue-500 mt-1 uppercase tracking-wider">PTO</span>}
+                        <div style={{ display: 'flex', flexDirection: 'column', padding: '12px 16px', gap: 10 }}>
+                            {mockData.revenueByProvider.map(p => (
+                                <div key={p.name} className="hr-row" style={{
+                                    display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center',
+                                    padding: '14px 16px', borderRadius: 14, gap: 14, cursor: 'pointer',
+                                    background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)',
+                                    transition: 'background 0.2s ease, border-color 0.2s ease',
+                                }}
+                                    onMouseEnter={e => { e.currentTarget.style.background='rgba(99,102,241,0.08)'; e.currentTarget.style.borderColor='rgba(99,102,241,0.25)'; }}
+                                    onMouseLeave={e => { e.currentTarget.style.background='rgba(255,255,255,0.03)'; e.currentTarget.style.borderColor='rgba(255,255,255,0.06)'; }}
+                                >
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                                        <div style={{
+                                            width: 40, height: 40, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                            fontSize: 14, fontWeight: 700, color: '#fff', background: 'linear-gradient(135deg,#6366f1,#8b5cf6)',
+                                            boxShadow: '0 4px 14px rgba(99,102,241,0.38)', flexShrink: 0,
+                                        }}>
+                                            {p.name.split(" ").map(n=>n[0]).slice(0,2).join("")}
                                         </div>
-                                    );
-                                })}
-                            </div>
-                        </div>
-                    </Card>
-                </div>
-            )}
-
-            {tab === "training" && (
-                <Card className="w-full mb-6">
-                    <div className="p-6 h-full flex flex-col">
-                        <SectionHeader title="Training & Compliance Status" />
-                        <div className="flex flex-col gap-3 w-full mt-4">
-                            {[
-                                { name: "HIPAA Privacy & Security", completed: 21, total: 23, due: "2026-04-01" },
-                                { name: "OSHA Safety Training", completed: 18, total: 23, due: "2026-03-15" },
-                                { name: "MA Phlebotomy Certification", completed: 4, total: 5, due: "2026-06-01" },
-                                { name: "EMG/EEG Prep Training", completed: 3, total: 5, due: "2026-05-30" },
-                                { name: "Fire Safety & Evacuation", completed: 23, total: 23, due: "2026-12-01" },
-                            ].map(tr => (
-                                <div key={tr.name} className="p-4 rounded-xl bg-slate-50 dark:bg-[#1E293B]/20 border border-slate-200 dark:border-slate-800 hover:border-blue-300 dark:hover:border-blue-800/60 transition-colors w-full">
-                                    <div className="flex flex-wrap justify-between items-center mb-2.5 w-full gap-2">
-                                        <span className="text-[13px] font-bold text-slate-900 dark:text-slate-100">{tr.name}</span>
-                                        <div className="flex items-center gap-3">
-                                            <span className="text-[12px] font-semibold text-slate-500 font-mono">{tr.completed}/{tr.total}</span>
-                                            <Badge color={tr.completed === tr.total ? "green" : tr.completed / tr.total > 0.8 ? "amber" : "red"}>
-                                                {tr.completed === tr.total ? "Complete" : `${Math.round(tr.completed / tr.total * 100)}%`}
-                                            </Badge>
+                                        <div>
+                                            <div style={{ fontSize: 14, fontWeight: 700, color: '#f1f5f9' }}>{p.name}</div>
+                                            <div style={{ fontSize: 12, color: 'rgba(148,163,184,0.55)', marginTop: 2 }}>Base salary + productivity bonus</div>
                                         </div>
                                     </div>
-                                    <div className="h-1.5 rounded-full bg-slate-200 dark:bg-slate-800 w-full overflow-hidden">
-                                        <div
-                                            className={`h-full rounded-full transition-all duration-700 ${tr.completed === tr.total ? "bg-emerald-500" : "bg-blue-500"}`}
-                                            style={{ width: `${(tr.completed / tr.total) * 100}%` }}
-                                        />
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+                                        <div style={{ textAlign: 'right' }}>
+                                            <div className="hr-mono" style={{ fontSize: 15, fontWeight: 700, color: '#f1f5f9' }}>
+                                                {fmtK(p.expenses)}<span style={{ fontSize: 11, color: 'rgba(148,163,184,0.45)' }}>/mo</span>
+                                            </div>
+                                            <div style={{ fontSize: 11, color: 'rgba(148,163,184,0.5)', marginTop: 2 }}>
+                                                wRVU: <span style={{ color: '#cbd5e1', fontFamily: 'JetBrains Mono,monospace' }}>{p.rvu.toLocaleString()}</span>
+                                            </div>
+                                        </div>
+                                        <Badge color="green">Active</Badge>
                                     </div>
-                                    <div className="text-[11px] font-medium text-slate-400 dark:text-slate-500 mt-2.5">Due: {tr.due}</div>
                                 </div>
                             ))}
                         </div>
                     </div>
-                </Card>
+                </div>
+            )}
+
+            {/* ── Coverage & PTO ── */}
+            {tab === "coverage" && (
+                <div key="coverage" style={{ display: 'flex', flexDirection: 'column', gap: 16 }} className="anim-enter">
+                    <div className="stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px,1fr))', gap: 14 }}>
+                        <StatCard label="PTO Requests"    value="3"     sub="Awaiting approval"  icon={<Calendar size={20}/>}     color="cyan"   />
+                        <StatCard label="Coverage Gaps"   value="0"     sub="All shifts covered"  icon={<CheckCircle size={20}/>}  color="green"  />
+                        <StatCard label="Call Schedule"   value="4"     sub="Providers on call"   icon={<Clock size={20}/>}        color="blue"   />
+                        <StatCard label="PTO Balance Avg" value="12.4d" sub="Across all staff"    icon={<Users size={20}/>}        color="purple" />
+                    </div>
+
+                    <div className="glass-card anim-enter" style={{ borderRadius: 20, padding: '22px 24px' }}>
+                        <SectionHeader title="Coverage Calendar — March 2026" />
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 8, marginBottom: 8 }}>
+                            {["Mon","Tue","Wed","Thu","Fri"].map(d => (
+                                <div key={d} style={{ textAlign: 'center', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(148,163,184,0.45)', paddingBottom: 8 }}>{d}</div>
+                            ))}
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 8 }}>
+                            {Array.from({ length: 20 }, (_, i) => {
+                                const pto = [2,7,12,15].includes(i);
+                                return (
+                                    <div key={i} className={`cal-day ${pto ? 'cal-day-pto' : ''}`} style={{
+                                        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                                        padding: '14px 8px', borderRadius: 12, cursor: 'pointer',
+                                        border: `1px solid ${pto ? 'rgba(99,102,241,0.30)' : 'rgba(255,255,255,0.06)'}`,
+                                        background: pto ? 'rgba(99,102,241,0.14)' : 'rgba(255,255,255,0.02)',
+                                    }}>
+                                        <span style={{ fontSize: 14, fontWeight: 600, color: pto ? '#a5b4fc' : 'rgba(148,163,184,0.65)' }}>{i+1}</span>
+                                        {pto && <span style={{ fontSize: 9, fontWeight: 700, color: '#818cf8', marginTop: 4, letterSpacing: '0.1em', textTransform: 'uppercase' }}>PTO</span>}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* ── Training ── */}
+            {tab === "training" && (
+                <div key="training" className="glass-card anim-enter" style={{ borderRadius: 20, padding: '22px 24px', marginBottom: 24 }}>
+                    <SectionHeader title="Training & Compliance Status" />
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                        {[
+                            { name: "HIPAA Privacy & Security",    completed: 21, total: 23, due: "2026-04-01" },
+                            { name: "OSHA Safety Training",        completed: 18, total: 23, due: "2026-03-15" },
+                            { name: "MA Phlebotomy Certification", completed: 4,  total: 5,  due: "2026-06-01" },
+                            { name: "EMG/EEG Prep Training",       completed: 3,  total: 5,  due: "2026-05-30" },
+                            { name: "Fire Safety & Evacuation",    completed: 23, total: 23, due: "2026-12-01" },
+                        ].map((tr, idx) => {
+                            const pct = tr.completed / tr.total;
+                            const done = tr.completed === tr.total;
+                            const barColor = done ? '#34d399' : pct > 0.8 ? '#fbbf24' : '#6366f1';
+                            return (
+                                <div key={tr.name} className="training-card" style={{
+                                    padding: '16px 18px', borderRadius: 14,
+                                    background: 'rgba(255,255,255,0.03)',
+                                    border: '1px solid rgba(255,255,255,0.07)',
+                                    animationDelay: `${idx * 60}ms`,
+                                }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, flexWrap: 'wrap', gap: 8 }}>
+                                        <span style={{ fontSize: 13, fontWeight: 700, color: '#f1f5f9' }}>{tr.name}</span>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                            <span className="hr-mono" style={{ fontSize: 12, fontWeight: 600, color: 'rgba(148,163,184,0.6)' }}>{tr.completed}/{tr.total}</span>
+                                            <Badge color={done ? 'green' : pct > 0.8 ? 'amber' : 'red'}>
+                                                {done ? 'Complete' : `${Math.round(pct*100)}%`}
+                                            </Badge>
+                                        </div>
+                                    </div>
+                                    <div style={{ height: 6, borderRadius: 999, background: 'rgba(255,255,255,0.06)', overflow: 'hidden' }}>
+                                        <div style={{
+                                            height: '100%', borderRadius: 999,
+                                            width: `${pct * 100}%`,
+                                            background: barColor,
+                                            boxShadow: `0 0 10px ${barColor}80`,
+                                            transition: 'width 0.9s cubic-bezier(0.22,1,0.36,1)',
+                                        }} />
+                                    </div>
+                                    <div style={{ fontSize: 11, color: 'rgba(148,163,184,0.45)', marginTop: 8 }}>Due: {tr.due}</div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
             )}
         </div>
     );

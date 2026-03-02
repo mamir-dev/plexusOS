@@ -64,10 +64,11 @@ export default function App() {
       <div className="min-h-screen flex flex-col md:flex-row bg-slate-50 dark:bg-[#080E1C] text-slate-900 dark:text-slate-50 font-sans transition-colors duration-300 overflow-hidden w-full">
 
         {/* ── Sidebar ── */}
-        <aside className={`shrink-0 flex flex-col bg-white dark:bg-[#0C1326] border-r border-slate-200 dark:border-slate-800 shadow-sm transition-all duration-300 z-20 absolute md:relative h-full ${sidebarOpen ? 'w-64 translate-x-0' : '-translate-x-full md:translate-x-0 md:w-[72px]'}`}>
+        {/* <aside className={`shrink-0 flex flex-col bg-white dark:bg-[#0C1326] border-r border-slate-200 dark:border-slate-800 shadow-sm transition-all duration-300 z-20 absolute md:relative h-full ${sidebarOpen ? 'w-64 translate-x-0' : '-translate-x-full md:translate-x-0 md:w-18'}`}> */}
+        <aside className={`shrink-0 flex flex-col bg-white dark:bg-[#0C1326] border-r border-slate-200 dark:border-slate-800 shadow-sm transition-all duration-300 z-50 fixed md:fixed inset-y-0 left-0 h-full ${sidebarOpen ? 'w-64 translate-x-0' : '-translate-x-full md:translate-x-0 md:w-18'}`}>
           {/* Logo */}
-          <div className="px-4 flex items-center gap-3 border-b border-slate-200 dark:border-slate-800 min-h-[64px] shrink-0">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shrink-0 shadow-sm">
+          <div className="px-4 flex items-center gap-3 border-b border-slate-200 dark:border-slate-800 min-h-16 shrink-0">
+            <div className="w-8 h-8 rounded-xl bg-linear-to-br from-blue-500 to-cyan-500 flex items-center justify-center shrink-0 shadow-sm">
               <span className="text-white text-sm font-bold font-mono tracking-tight">Px</span>
             </div>
             {sidebarOpen && (
@@ -141,9 +142,10 @@ export default function App() {
         </aside>
 
         {/* ── Main ── */}
-        <div className="flex-1 flex flex-col h-[100dvh] overflow-hidden relative w-full">
+        {/* <div className="flex-1 flex flex-col h-dvh overflow-hidden relative w-full"> */}
+        <div className={`flex-1 flex flex-col h-dvh overflow-hidden relative w-full transition-all duration-300 ${sidebarOpen ? 'md:ml-64' : 'md:ml-18'}`}>
           {/* Topbar */}
-          <header className="flex items-center justify-between px-4 sm:px-6 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-[#0C1326]/80 backdrop-blur-md min-h-[64px] shrink-0 shadow-sm z-10 w-full gap-4">
+          <header className="flex items-center justify-between px-4 sm:px-6 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-[#0C1326]/80 backdrop-blur-md min-h-16 shrink-0 shadow-sm z-10 w-full gap-4">
             <div className="flex items-center gap-3 overflow-hidden">
               <button
                 className="md:hidden p-2 -ml-2 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
@@ -190,13 +192,14 @@ export default function App() {
                 {/* Notification dropdown */}
                 {notifOpen && (
                   <>
-                    <div className="fixed inset-0 z-40 md:hidden bg-slate-900/20 backdrop-blur-sm" onClick={() => setNotifOpen(false)} />
+                    {/* <div className="fixed inset-0 z-40 md:hidden bg-slate-900/20 backdrop-blur-sm" onClick={() => setNotifOpen(false)} /> */}
+                    <div className="fixed inset-0 z-40 bg-slate-900/20 backdrop-blur-sm" onClick={() => setNotifOpen(false)} />
                     <div className="absolute right-0 top-12 z-50 w-80 rounded-xl overflow-hidden bg-white dark:bg-[#0E1529] border border-slate-200 dark:border-slate-800 shadow-xl origin-top-right animate-in fade-in zoom-in-95 duration-200">
                       <div className="flex justify-between items-center p-4 border-b border-slate-100 dark:border-slate-800">
                         <span className="text-[14px] font-bold text-slate-900 dark:text-white">Notifications</span>
                         <button className="text-[11px] font-bold text-blue-600 dark:text-blue-400 hover:underline">Mark all read</button>
                       </div>
-                      <div className="p-2 max-h-[360px] overflow-y-auto">
+                      <div className="p-2 max-h-90 overflow-y-auto">
                         {mockData.alerts.map(a => <AlertItem key={a.id} alert={a} />)}
                       </div>
                     </div>
@@ -210,7 +213,7 @@ export default function App() {
               </button>
 
               {/* Avatar */}
-              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-[13px] font-bold text-white shadow-sm shrink-0 cursor-pointer border-2 border-white dark:border-slate-800 ring-2 ring-transparent hover:ring-blue-500/30 transition-shadow">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-linear-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-[13px] font-bold text-white shadow-sm shrink-0 cursor-pointer border-2 border-white dark:border-slate-800 ring-2 ring-transparent hover:ring-blue-500/30 transition-shadow">
                 MG
               </div>
             </div>
@@ -218,7 +221,7 @@ export default function App() {
 
           {/* Content Area */}
           <main className="flex-1 overflow-y-auto p-4 sm:p-6 w-full relative">
-            <div className="max-w-[1600px] mx-auto w-full">
+            <div className="max-w-400 mx-auto w-full">
               {activeModule === "dashboard" && <ExecutiveDashboard />}
               {activeModule === "financial" && <FinancialModule />}
               {activeModule === "hr" && <HRModule />}
