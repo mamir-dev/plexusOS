@@ -270,7 +270,7 @@ export function SettingsModule() {
 
                 {/* User Management */}
                 <div className="set-glass set-enter rounded-2xl p-6" style={{ display: 'flex', flexDirection: 'column' }}>
-                    <SectionHeader
+                    {/* <SectionHeader
                         title="User Management"
                         right={
                             <button className="set-invite-btn" style={{
@@ -281,6 +281,22 @@ export function SettingsModule() {
                             }}>
                                 <UserPlus size={13} /> Invite User
                             </button>
+                        }
+                    /> */}
+
+                    <SectionHeader
+                        title={
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                                <span>User Management</span>
+                                <button className="set-invite-btn" style={{
+                                    display: 'flex', alignItems: 'center', gap: 7,
+                                    padding: '7px 16px', borderRadius: 10, border: 'none',
+                                    color: '#fff', fontSize: 12, fontWeight: 700,
+                                    cursor: 'pointer', fontFamily: 'Outfit,sans-serif', whiteSpace: 'nowrap',
+                                }}>
+                                    <UserPlus size={13} /> Invite User
+                                </button>
+                            </div>
                         }
                     />
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -318,7 +334,17 @@ export function SettingsModule() {
 
                 {/* Role-Based Access Control */}
                 <div className="set-glass set-enter rounded-2xl p-6" style={{ display: 'flex', flexDirection: 'column', animationDelay: '70ms' }}>
-                    <SectionHeader title="Role-Based Access Control" right={<Shield size={16} style={{ color: dark ? 'rgba(148,163,184,0.35)' : 'rgba(71,85,105,0.35)' }} />} />
+                    {/* <SectionHeader 
+                    title="Role-Based Access Control" 
+                    right={<Shield size={16} style={{ color: dark ? 'rgba(148,163,184,0.35)' : 'rgba(71,85,105,0.35)' }} />} /> */}
+                    <SectionHeader
+                    title={
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <Shield size={16} style={{ color: dark ? 'rgba(148,163,184,0.35)' : 'rgba(71,85,105,0.35)' }} />
+                        <span>Role-Based Access Control</span>
+                        </div>
+                    }
+                    />
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                         {[
                             { role: "Practice Admin",  perms: ["Financial","HR","Contracts","Settings"],         color: "green"  },
@@ -354,7 +380,15 @@ export function SettingsModule() {
 
             {/* ── Site Configuration ── */}
             <div className="set-glass set-enter rounded-2xl p-6" style={{ animationDelay: '140ms' }}>
-                <SectionHeader title="Site Configuration" right={<MapPin size={16} style={{ color: dark ? 'rgba(148,163,184,0.35)' : 'rgba(71,85,105,0.35)' }} />} />
+                {/* <SectionHeader 
+                title="Site Configuration" 
+                right={<MapPin size={16} style={{ color: dark ? 'rgba(148,163,184,0.35)' : 'rgba(71,85,105,0.35)' }} />} /> */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+                <Shield size={18} style={{ color: dark ? '#94a3b8' : '#475569' }} />
+                <span style={{ fontSize: 18, fontWeight: 700, color: dark ? '#f1f5f9' : '#1e293b' }}>
+                    Role-Based Access Control
+                </span>
+                </div>
                 <div className="set-stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(180px,1fr))', gap: 12 }}>
                     {mockData.sites.slice(1).map((site, idx) => (
                         <div key={site} className="set-site-card set-enter" style={{
@@ -378,7 +412,17 @@ export function SettingsModule() {
 
             {/* ── Notification Preferences ── */}
             <div className="set-glass set-enter rounded-2xl p-6" style={{ marginBottom: 24, animationDelay: '200ms' }}>
-                <SectionHeader title="Notification Preferences" right={<Bell size={16} style={{ color: dark ? 'rgba(148,163,184,0.35)' : 'rgba(71,85,105,0.35)' }} />} />
+                {/* <SectionHeader 
+                title="Notification Preferences" 
+                right={<Bell size={16} style={{ color: dark ? 'rgba(148,163,184,0.35)' : 'rgba(71,85,105,0.35)' }} />} /> */}
+                <SectionHeader
+                title={
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <Bell size={16} style={{ color: dark ? 'rgba(148,163,184,0.35)' : 'rgba(71,85,105,0.35)' }} />
+                    <span>Notification Preferences</span>
+                    </div>
+                }
+                />
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))', gap: 10 }}>
                     {prefLabels.map((label, i) => (
                         <div key={i} className="set-notif-row set-enter" style={{

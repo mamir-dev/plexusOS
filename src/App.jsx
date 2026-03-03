@@ -67,7 +67,8 @@ export default function App() {
         {/* <aside className={`shrink-0 flex flex-col bg-white dark:bg-[#0C1326] border-r border-slate-200 dark:border-slate-800 shadow-sm transition-all duration-300 z-20 absolute md:relative h-full ${sidebarOpen ? 'w-64 translate-x-0' : '-translate-x-full md:translate-x-0 md:w-18'}`}> */}
         <aside className={`shrink-0 flex flex-col bg-white dark:bg-[#0C1326] border-r border-slate-200 dark:border-slate-800 shadow-sm transition-all duration-300 z-50 fixed md:fixed inset-y-0 left-0 h-full ${sidebarOpen ? 'w-64 translate-x-0' : '-translate-x-full md:translate-x-0 md:w-18'}`}>
           {/* Logo */}
-          <div className="px-4 flex items-center gap-3 border-b border-slate-200 dark:border-slate-800 min-h-16 shrink-0">
+          {/* <div className="px-4 flex items-center gap-3 border-b border-slate-200 dark:border-slate-800 min-h-16 shrink-0"> */}
+          <div className="pl-0 pr-0 flex items-center gap-3 border-b border-slate-200 dark:border-slate-800 min-h-16 shrink-0">
             {/* <div className="w-8 h-8 rounded-xl bg-linear-to-br from-blue-500 to-cyan-500 flex items-center justify-center shrink-0 shadow-sm">
               <span className="text-white text-sm font-bold font-mono tracking-tight">Px</span>
             </div> */}
