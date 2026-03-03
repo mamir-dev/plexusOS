@@ -340,7 +340,7 @@ export function SettingsModule() {
                     <SectionHeader
                     title={
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <Shield size={16} style={{ color: dark ? 'rgba(148,163,184,0.35)' : 'rgba(71,85,105,0.35)' }} />
+                        {/* <Shield size={16} style={{ color: dark ? 'rgba(148,163,184,0.35)' : 'rgba(71,85,105,0.35)' }} /> */}
                         <span>Role-Based Access Control</span>
                         </div>
                     }
@@ -384,7 +384,7 @@ export function SettingsModule() {
                 title="Site Configuration" 
                 right={<MapPin size={16} style={{ color: dark ? 'rgba(148,163,184,0.35)' : 'rgba(71,85,105,0.35)' }} />} /> */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
-                <Shield size={18} style={{ color: dark ? '#94a3b8' : '#475569' }} />
+                {/* <Shield size={18} style={{ color: dark ? '#94a3b8' : '#475569' }} /> */}
                 <span style={{ fontSize: 18, fontWeight: 700, color: dark ? '#f1f5f9' : '#1e293b' }}>
                     Role-Based Access Control
                 </span>
@@ -418,7 +418,7 @@ export function SettingsModule() {
                 <SectionHeader
                 title={
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <Bell size={16} style={{ color: dark ? 'rgba(148,163,184,0.35)' : 'rgba(71,85,105,0.35)' }} />
+                    {/* <Bell size={16} style={{ color: dark ? 'rgba(148,163,184,0.35)' : 'rgba(71,85,105,0.35)' }} /> */}
                     <span>Notification Preferences</span>
                     </div>
                 }

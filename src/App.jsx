@@ -73,9 +73,9 @@ export default function App() {
               <span className="text-white text-sm font-bold font-mono tracking-tight">Px</span>
             </div> */}
             <img 
-              src="/plexus.png" 
+              src="/plexus-os.png" 
               alt="PlexusOS Logo" 
-              className="w-45 h-15 object-cover shrink-0"
+              className="w-40 h-11 object-cover shrink-0"
             />
             {sidebarOpen && (
               <div className="flex flex-col overflow-hidden">
